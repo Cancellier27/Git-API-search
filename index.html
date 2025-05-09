@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GitHub Search App</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>GitHub Search</h1>
+        <form id="search-form">
+          <input
+            type="text"
+            id="username-input"
+            placeholder="Enter GitHub username"
+            required
+          />
+          <button type="submit">Search</button>
+        </form>
+      </header>
+      <div id="user-not-found">
+        User not found! Please try again.
+      </div>
+      <main id="results">
+        <section id="profile" class="card">
+          <img id="avatar" alt="User avatar" />
+          <h2 id="name"></h2>
+          <p id="bio"></p>
+          <p id="location"></p>
+          <p id="company"></p>
+          <div class="follow-stats">
+            <span id="followers">Followers: 0</span>
+            <span id="following">Following: 0</span>
+          </div>
+        </section>
+
+        <section id="repos">
+          <h3>Repositories</h3>
+          <div class="card-grid" id="repo-list"></div>
+        </section>
+
+        <section id="starred">
+          <h3>Starred Repositories</h3>
+          <div class="card-grid" id="starred-list"></div>
+        </section>
+      </main>
+    </div>
+
+    <script src="out/main.js"></script>
+  </body>
+</html>

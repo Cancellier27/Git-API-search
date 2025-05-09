@@ -1,0 +1,147 @@
+/* GitHub-inspired palette */
+:root {
+  --bg-color: #28313f;
+  --card-bg: #161b22;
+  --text-color: #eaeef3;
+  --accent-color: #4bb5f3;
+  --border-color: #30363d;
+  --text-error: #ff0000;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  padding: 1rem;
+}
+
+.container {
+  max-width: 900px;
+  margin: auto;
+}
+
+header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+header h1 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+#user-not-found {
+  display: none;
+  justify-content: center;
+  color: var(--text-error);
+  font-size: 1.3rem;
+}
+
+#results {
+  display: none;
+}
+
+#search-form {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+#username-input {
+  padding: 0.5rem;
+  font-size: 1rem;
+  width: 60%;
+  min-width: 200px;
+  background-color: var(--card-bg);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
+}
+
+button {
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  background-color: var(--accent-color);
+  border: none;
+  border-radius: 5px;
+  color: #fff;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+button:hover {
+  background-color: #1f6feb;
+}
+
+main h3 {
+  margin: 1.5rem 0 1rem;
+  font-size: 1.3rem;
+}
+
+.card {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 1rem;
+  margin-bottom: 2rem;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+#avatar {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  margin-bottom: 1rem;
+  border: 2px solid var(--border-color);
+}
+
+.follow-stats {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin-top: 1rem;
+  font-weight: bold;
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1rem;
+}
+
+.card-grid .repo-card {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 1rem;
+  transition: transform 0.2s;
+}
+
+.card-grid .repo-card:hover {
+  transform: scale(1.02);
+}
+
+.repo-card a {
+  color: var(--accent-color);
+  text-decoration: none;
+  font-weight: bold;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.repo-card a:hover {
+  text-decoration: underline;
+}
+
+.repo-card p {
+  font-size: 0.9rem;
+  color: #8b949e;
+}
