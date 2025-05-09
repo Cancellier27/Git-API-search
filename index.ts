@@ -14,6 +14,7 @@ const followersEl = document.getElementById("followers") as HTMLElement
 const followingEl = document.getElementById("following") as HTMLElement
 const repoList = document.getElementById("repo-list") as HTMLUListElement
 const starredList = document.getElementById("starred-list") as HTMLUListElement
+const languagesList = document.getElementById("languages") as HTMLUListElement
 
 interface GitHubUser {
   avatar_url: string
@@ -30,6 +31,7 @@ interface GitHubRepo {
   name: string
   html_url: string
   updated_at: string
+  languages_url: string
 }
 
 form.addEventListener("submit", async (event: Event) => {
@@ -65,6 +67,7 @@ form.addEventListener("submit", async (event: Event) => {
     populateUserProfile(userData)
     populateLists(reposData, repoList, "repo")
     populateLists(starredData, starredList, "star")
+    populateLanguages(reposData)
 
     // show the results on screen
     userNotFound.style.display = "none"
@@ -107,7 +110,10 @@ function populateLists(
   container.innerHTML = "" // Clear old content
 
   // sort the repos array from newest to oldest
-  const sortedRepos = repos.sort(function(a: GitHubRepo, b: GitHubRepo): number {
+  const sortedRepos = repos.sort(function (
+    a: GitHubRepo,
+    b: GitHubRepo
+  ): number {
     let date_A: number = new Date(a.updated_at).getTime()
     let date_B: number = new Date(b.updated_at).getTime()
     return date_B - date_A
@@ -155,4 +161,37 @@ function populateLists(
   }
 }
 
+async function populateLanguages(repos: GitHubRepo[]) {
+  const languages: {[key: string]: number} = {}
 
+  for (const repo of repos) {
+    try {
+      const response = await fetch(repo.languages_url)
+
+      if (!response.ok) {
+        console.warn(`Could not fetch languages for repo: ${repo.name}`)
+        continue
+      }
+
+      const languageData = await response.json()
+
+      Object.entries(languageData).forEach(([key, value]) => {
+        if (typeof value === "number") {
+          languages[key] = (languages[key] || 0) + value
+        }
+      })
+    } catch (error) {
+      console.error("Error while fetching the languages:", error)
+    }
+  }
+
+  Object.keys(languages)
+    .sort()
+    .forEach((key) => {
+      let listEl = document.createElement("li")
+      listEl.textContent = key
+      languagesList.appendChild(listEl)
+    })
+
+  return
+}
