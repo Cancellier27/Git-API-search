@@ -66,9 +66,16 @@ By doing this you will be limited to only 60 API calls per hour
   // Change all the calls made by "fetchWithToken()" to only "fetch()".
 ```
 
+7. Compile the .ts file into a .js file
+```bash
+// Run the command tsc in the root of your app to compile the .ts files into .js files
+
+tsc
+```
+Now the app should be running on http://localhost:8080
 
 
-6. Start the http-server
+7. Start the http-server
 ```bash
 npm start
 ```
