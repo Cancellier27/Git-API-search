@@ -20,9 +20,7 @@
           <button type="submit">Search</button>
         </form>
       </header>
-      <div id="user-not-found">
-        User not found! Please try again.
-      </div>
+      <div id="user-not-found">User not found! Please try again.</div>
       <main id="results">
         <section id="profile" class="card">
           <img id="avatar" alt="User avatar" />
@@ -37,9 +35,34 @@
             <span id="following">Following: 0</span>
           </div>
         </section>
-        <section>
-          <h3>Most used languages</h3>
-          <ul id="languages">  </ul>
+
+        <section id="languages-container">
+          <div class="languages-placeholder">
+            <h4>Loading languages...</h4>
+          </div>
+          
+          <div class="languages-list">
+            <h4>Most used languages</h4>
+            <ul id="languages">
+              <li><p>Typescript</p>
+                <div class="lang-bar">
+                <div></div><p>10%</p>
+              </div>
+            </li>
+              <li>
+                <p>Typescript</p>
+                <div class="lang-bar">
+                <div></div><p>20%</p>
+              </div>
+            </li>
+              <li><p>Typescript</p>
+                <div class="lang-bar">
+                <div></div><p>50%</p>
+              </div>
+            </li>
+
+            </ul>
+          </div>
         </section>
 
         <section id="repos">
@@ -54,6 +77,6 @@
       </main>
     </div>
 
-    <script src="out/index.js"></script>
+    <script src="out/index.js" type="module"></script>
   </body>
 </html>

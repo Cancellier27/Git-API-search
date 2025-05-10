@@ -1,3 +1,5 @@
+import {GITHUB_TOKEN} from "./data.js"
+
 const form = document.getElementById("search-form") as HTMLFormElement
 const usernameInput = document.getElementById(
   "username-input"
@@ -14,7 +16,13 @@ const followersEl = document.getElementById("followers") as HTMLElement
 const followingEl = document.getElementById("following") as HTMLElement
 const repoList = document.getElementById("repo-list") as HTMLUListElement
 const starredList = document.getElementById("starred-list") as HTMLUListElement
-const languagesList = document.getElementById("languages") as HTMLUListElement
+const languagesObj = document.getElementById("languages") as HTMLUListElement
+const languagesPlaceholder = document.querySelector(
+  ".languages-placeholder"
+) as HTMLDivElement
+const languagesList = document.querySelector(
+  ".languages-list"
+) as HTMLDivElement
 
 interface GitHubUser {
   avatar_url: string
@@ -34,6 +42,15 @@ interface GitHubRepo {
   languages_url: string
 }
 
+async function fetchWithToken(url: string): Promise<Response> {
+  return fetch(url, {
+    headers: {
+      Authorization: `token ${GITHUB_TOKEN}`,
+      Accept: "application/vnd.github.v3+json"
+    }
+  })
+}
+
 form.addEventListener("submit", async (event: Event) => {
   try {
     event.preventDefault()
@@ -47,9 +64,9 @@ form.addEventListener("submit", async (event: Event) => {
 
     // fetch all information separately
     const [userResponse, reposResponse, starredResponse] = await Promise.all([
-      fetch(`https://api.github.com/users/${username}`),
-      fetch(`https://api.github.com/users/${username}/repos`),
-      fetch(`https://api.github.com/users/${username}/starred`)
+      fetchWithToken(`https://api.github.com/users/${username}`),
+      fetchWithToken(`https://api.github.com/users/${username}/repos`),
+      fetchWithToken(`https://api.github.com/users/${username}/starred`)
     ])
 
     if (!userResponse.ok) {
@@ -163,10 +180,16 @@ function populateLists(
 
 async function populateLanguages(repos: GitHubRepo[]) {
   const languages: {[key: string]: number} = {}
-
+  let totalValue: number = 0
+  // reset DOM element
+  languagesObj.innerHTML = ""
+  // Hide previous list and show loading message
+  languagesList.style.display = "none"
+  languagesPlaceholder.style.display = "block"
+  // get the languages in a object
   for (const repo of repos) {
     try {
-      const response = await fetch(repo.languages_url)
+      const response = await fetchWithToken(repo.languages_url)
 
       if (!response.ok) {
         console.warn(`Could not fetch languages for repo: ${repo.name}`)
@@ -178,6 +201,7 @@ async function populateLanguages(repos: GitHubRepo[]) {
       Object.entries(languageData).forEach(([key, value]) => {
         if (typeof value === "number") {
           languages[key] = (languages[key] || 0) + value
+          totalValue += value
         }
       })
     } catch (error) {
@@ -185,13 +209,18 @@ async function populateLanguages(repos: GitHubRepo[]) {
     }
   }
 
+  // append the languages in a tag elements
   Object.keys(languages)
     .sort()
     .forEach((key) => {
+      let percentage: number = Math.round(100 * (languages[key] / totalValue))
       let listEl = document.createElement("li")
-      listEl.textContent = key
-      languagesList.appendChild(listEl)
+      listEl.textContent = `${key} - ${percentage}%`
+      languagesObj.appendChild(listEl)
     })
+  // show languages list and hid the loading message
+  languagesPlaceholder.style.display = "none"
+  languagesList.style.display = "block"
 
   return
 }
