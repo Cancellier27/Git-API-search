@@ -1,4 +1,4 @@
-import {GITHUB_TOKEN} from "./data.js"
+import {GITHUB_TOKEN} from "./token.js"
 
 const form = document.getElementById("search-form") as HTMLFormElement
 const usernameInput = document.getElementById(

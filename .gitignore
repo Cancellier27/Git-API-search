@@ -136,5 +136,5 @@ dist
 .pnp.*
 
 #ignore the git-token file
-data.ts
-data.js
+token.ts
+token.js
