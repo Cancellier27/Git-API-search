@@ -51,25 +51,22 @@ npm install
 
 ```bash
 //token.ts
-
 export const GITHUB_TOKEN: string = <your git token>
 ```
 
 5. If you do not have a token, you can still run it, buy will need to modify a few lines.
 By doing this you will be limited to only 60 API calls per hour
+    - You can delete the function "fetchWithToken()" as it is not needed anymore and change all the calls made by it to only "fetch()".
+    - Remove the first line from the index.ts file, the import token statement:
 ```bash
-  //Remove the first line from the index.ts file, the import token statement:
-    import {GITHUB_TOKEN} from "./token.js"
-
-  // Can delete the function "fetchWithToken()" as it is not needed anymore.
-
-  // Change all the calls made by "fetchWithToken()" to only "fetch()".
+// Delete line
+import {GITHUB_TOKEN} from "./token.js"
 ```
 
-6. Compile the .ts file into a .js file
-```bash
-// Run the command tsc in the root of your app to compile the .ts files into .js files
 
+6. Compile the .ts file into a .js file
+    - Run the command tsc in the root of your app to compile the .ts files into .js files
+```bash
 tsc
 ```
 
