@@ -64,7 +64,7 @@ token.js
 ```
 
 6. If you do not have a token, you can still run it, buy will need to modify a few lines:
-   ```bash
+```bash
   //Remove the first line from the index.ts file, the import token statement:
     import {GITHUB_TOKEN} from "./token.js"
 
