@@ -47,7 +47,7 @@ npm install
 4. You will need to have a GitHub Token.
    - Get your token and paste it inside a file named token.ts
    - If you are using another file name, make sure to add it to .gitignore 
-   - Using a toke will allow you to make many more requests to the API
+   - Using a token will allow you to make many more requests to the API
 
 ```bash
 //token.ts
@@ -55,7 +55,8 @@ npm install
 export const GITHUB_TOKEN: string = <your git token>
 ```
 
-5. If you do not have a token, you can still run it, buy will need to modify a few lines:
+5. If you do not have a token, you can still run it, buy will need to modify a few lines.
+By doing this you will be limited to only 60 API calls per hour
 ```bash
   //Remove the first line from the index.ts file, the import token statement:
     import {GITHUB_TOKEN} from "./token.js"
@@ -64,6 +65,7 @@ export const GITHUB_TOKEN: string = <your git token>
 
   // Change all the calls made by "fetchWithToken()" to only "fetch()".
 ```
+
 
 
 6. Start the http-server
