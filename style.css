@@ -43,7 +43,7 @@ header h1 {
 }
 
 #results {
-  /* display: none; */
+  display: none;
 }
 
 #search-form {
@@ -141,28 +141,30 @@ main h3 {
   list-style-type: none;
 }
 #languages > li {
-  margin-bottom: 5px;
+  margin-bottom: 0px;
+}
+
+#languages > li > p {
+  font-size: 0.9rem;
 }
 
 .languages-list {
   /* dynamically change when loaded */
-  /* display: none; */
+  display: none;
 }
 
-.lang-bar {
+.lang-bar-container {
   display: flex;
   align-items: center;
-  font-size: 0.8rem;
+  font-size: 0.9rem;
 }
 
-.lang-bar > p {
+.lang-percentage {
   margin-left: 5px;
 }
 
-.lang-bar > div {
-  width: 30%;
-  height: 3px;
-  background-color: red;
+.lang-bar {
+    height: 4px;;
 }
 
 .card-grid .repo-card {

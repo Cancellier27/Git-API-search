@@ -16,7 +16,7 @@ const followersEl = document.getElementById("followers") as HTMLElement
 const followingEl = document.getElementById("following") as HTMLElement
 const repoList = document.getElementById("repo-list") as HTMLUListElement
 const starredList = document.getElementById("starred-list") as HTMLUListElement
-const languagesObj = document.getElementById("languages") as HTMLUListElement
+const languagesUList = document.getElementById("languages") as HTMLUListElement
 const languagesPlaceholder = document.querySelector(
   ".languages-placeholder"
 ) as HTMLDivElement
@@ -182,10 +182,11 @@ async function populateLanguages(repos: GitHubRepo[]) {
   const languages: {[key: string]: number} = {}
   let totalValue: number = 0
   // reset DOM element
-  languagesObj.innerHTML = ""
+  languagesUList.innerHTML = ""
   // Hide previous list and show loading message
   languagesList.style.display = "none"
   languagesPlaceholder.style.display = "block"
+
   // get the languages in a object
   for (const repo of repos) {
     try {
@@ -210,14 +211,47 @@ async function populateLanguages(repos: GitHubRepo[]) {
   }
 
   // append the languages in a tag elements
-  Object.keys(languages)
-    .sort()
-    .forEach((key) => {
-      let percentage: number = Math.round(100 * (languages[key] / totalValue))
-      let listEl = document.createElement("li")
-      listEl.textContent = `${key} - ${percentage}%`
-      languagesObj.appendChild(listEl)
-    })
+  if (Object.keys(languages).length === 0) {
+    let listEl = document.createElement("li")
+    listEl.textContent = "No language used found"
+    languagesUList.appendChild(listEl)
+  } else {
+    Object.entries(languages)
+      .sort()
+      .forEach(([key, value]) => {
+        let percentage: number = Math.round(100 * (value / totalValue))
+
+        // do not create any languages that are 0%
+        if (percentage >= 1) {
+          let listEl = document.createElement("li") as HTMLLIElement
+          let langName = document.createElement("p") as HTMLParagraphElement
+          let container = document.createElement("div") as HTMLDivElement
+          let langBar = document.createElement("div") as HTMLDivElement
+          let langPercentage = document.createElement(
+            "p"
+          ) as HTMLParagraphElement
+
+          langName.textContent = key
+          langPercentage.textContent = `${percentage}%`
+
+          langBar.style.width = `${percentage}%`
+
+          langBar.style.backgroundColor = `hsl(${
+            Math.random() * 360
+          }, 90%, 80%)`
+
+          langBar.classList.add("lang-bar")
+          langPercentage.classList.add("lang-percentage")
+          container.classList.add("lang-bar-container")
+
+          container.appendChild(langBar)
+          container.appendChild(langPercentage)
+          listEl.appendChild(langName)
+          listEl.appendChild(container)
+          languagesUList.appendChild(listEl)
+        }
+      })
+  }
   // show languages list and hid the loading message
   languagesPlaceholder.style.display = "none"
   languagesList.style.display = "block"
