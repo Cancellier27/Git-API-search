@@ -1,4 +1,5 @@
 import {GITHUB_TOKEN} from "./token.js"
+import {cacheData} from "./cache.js"
 
 const form = document.getElementById("search-form") as HTMLFormElement
 const usernameInput = document.getElementById(
@@ -23,6 +24,7 @@ const languagesPlaceholder = document.querySelector(
 const languagesList = document.querySelector(
   ".languages-list"
 ) as HTMLDivElement
+const loading = document.querySelector(".loader-container") as HTMLDivElement
 
 interface GitHubUser {
   avatar_url: string
@@ -42,6 +44,59 @@ interface GitHubRepo {
   languages_url: string
 }
 
+interface Data {
+  userData: GitHubUser
+  reposData: GitHubRepo[]
+  starredData: GitHubRepo[]
+}
+
+form.addEventListener("submit", async (event: Event) => {
+  try {
+    event.preventDefault()
+    clearDOM()
+    // hide the previous search UI
+    results.style.display = "none"
+    // show loading message for the hole component
+    loading.style.display = "flex"
+    // get username input and return if none was inserted
+    const username = usernameInput.value.trim()
+    if (!username) return
+
+    // check if there is any data in the localStorage
+    let data: Data
+    const cachedUserData = localStorage.getItem("userData")
+    if (cachedUserData && JSON.parse(cachedUserData).login === username) {
+      // get data from "cache"
+      console.log("getting data from localStorage")
+      data = {
+        userData: JSON.parse(cachedUserData),
+        reposData: JSON.parse(localStorage.getItem("reposData") || "[]"),
+        starredData: JSON.parse(localStorage.getItem("reposData") || "[]")
+      }
+    } else {
+      console.log("fetching data")
+      // fetch the data from API
+      data = await fetchData(username)
+    }
+
+    // run functions to populate the DOM
+    populateUserProfile(data.userData)
+    populateLists(data.reposData, repoList, "repo")
+    populateLists(data.starredData, starredList, "star")
+    populateLanguages(data.reposData)
+
+    // show the results on screen
+    loading.style.display = "none"
+    userNotFound.style.display = "none"
+    results.style.display = "block"
+  } catch (error) {
+    loading.style.display = "none"
+    userNotFound.innerHTML = `Error while searching for the user:<br>${error}`
+    userNotFound.style.display = "flex"
+    console.error("Error fetching data!", error)
+  }
+})
+
 async function fetchWithToken(url: string): Promise<Response> {
   return fetch(url, {
     headers: {
@@ -51,51 +106,39 @@ async function fetchWithToken(url: string): Promise<Response> {
   })
 }
 
-form.addEventListener("submit", async (event: Event) => {
-  try {
-    event.preventDefault()
-    // hide the previous search UI
-    results.style.display = "none"
-    // get username input and return is none was inserted
-    const username = usernameInput.value.trim()
-    if (!username) return
+async function fetchData(username: string) {
+  // fetch all information separately
+  const [userResponse, reposResponse, starredResponse] = await Promise.all([
+    fetchWithToken(`https://api.github.com/users/${username}`),
+    fetchWithToken(`https://api.github.com/users/${username}/repos`),
+    fetchWithToken(`https://api.github.com/users/${username}/starred`)
+  ])
 
-    clearData()
-
-    // fetch all information separately
-    const [userResponse, reposResponse, starredResponse] = await Promise.all([
-      fetchWithToken(`https://api.github.com/users/${username}`),
-      fetchWithToken(`https://api.github.com/users/${username}/repos`),
-      fetchWithToken(`https://api.github.com/users/${username}/starred`)
-    ])
-
-    if (!userResponse.ok) {
-      // show error message
-      userNotFound.style.display = "flex"
-      throw new Error("User not found")
-    }
-
-    // get json data from the responses
-    const userData: GitHubUser = await userResponse.json()
-    const reposData: GitHubRepo[] = await reposResponse.json()
-    const starredData: GitHubRepo[] = await starredResponse.json()
-
-    // run functions to populate the DOM
-    populateUserProfile(userData)
-    populateLists(reposData, repoList, "repo")
-    populateLists(starredData, starredList, "star")
-    populateLanguages(reposData)
-
-    // show the results on screen
-    userNotFound.style.display = "none"
-    results.style.display = "block"
-  } catch (error) {
-    console.error("Error fetching data!", error)
+  if (!userResponse.ok) {
+    // show error message
+    userNotFound.textContent = "User not found! Please try again."
+    userNotFound.style.display = "flex"
+    throw new Error("User not found")
   }
-})
+
+  // get json data from the responses
+  const userData: GitHubUser = await userResponse.json()
+  const reposData: GitHubRepo[] = await reposResponse.json()
+  const starredData: GitHubRepo[] = await starredResponse.json()
+
+  // clean local storage
+  localStorage.clear()
+
+  // add new data to local storage
+  cacheData(userData, "userData")
+  cacheData(reposData, "reposData")
+  cacheData(starredData, "starredData")
+
+  return {userData, reposData, starredData}
+}
 
 // clear DOM elements
-function clearData() {
+function clearDOM() {
   avatar.src = ""
   nameLink.textContent = ""
   bioEl.textContent = ""

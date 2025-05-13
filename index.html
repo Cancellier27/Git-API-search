@@ -20,7 +20,12 @@
           <button type="submit">Search</button>
         </form>
       </header>
-      <div id="user-not-found">User not found! Please try again.</div>
+
+      <div class="loader-container">
+        <div class="loading-text">Loading<span class="dots"></span></div>
+      </div>
+
+      <p id="user-not-found"></p>
       <main id="results">
         <section id="profile" class="card">
           <img id="avatar" alt="User avatar" />
@@ -38,13 +43,12 @@
 
         <section id="languages-container">
           <div class="languages-placeholder">
-            <h4>Loading languages...</h4>
+            <div class="loading-text">Loading Languages<span class="dots"></span></div>
           </div>
 
           <div class="languages-list">
             <h4>Most used languages:</h4>
             <ul id="languages">
-
               <li>
                 <p>Typescript</p>
                 <div class="lang-bar-container">
@@ -52,9 +56,6 @@
                   <p class="lang-percentage">20%</p>
                 </div>
               </li>
-
-             
-
             </ul>
           </div>
         </section>
