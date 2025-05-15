@@ -22,7 +22,7 @@
       </header>
 
       <div class="loader-container">
-        <div class="loading-text">Loading<span class="dots"></span></div>
+        <p class="loading-text">Loading User<span class="dots"></span></p>
       </div>
 
       <p id="user-not-found"></p>
@@ -43,30 +43,38 @@
 
         <section id="languages-container">
           <div class="languages-placeholder">
-            <div class="loading-text">Loading Languages<span class="dots"></span></div>
+            <p class="loading-text">
+              Loading Languages<span class="dots"></span>
+            </p>
           </div>
 
           <div class="languages-list">
             <h4>Most used languages:</h4>
-            <ul id="languages">
-              <li>
-                <p>Typescript</p>
-                <div class="lang-bar-container">
-                  <div class="lang-bar"></div>
-                  <p class="lang-percentage">20%</p>
-                </div>
-              </li>
-            </ul>
+            <ul id="languages"></ul>
           </div>
         </section>
 
         <section id="repos">
-          <h3>Repositories</h3>
+          <div class="filter-container">
+            <h3>Repositories</h3>
+            <select name="repo-filter" id="repo-filter">
+              <option value="">Filter by</option>
+              <option value="newest">Newest</option>
+              <option value="oldest">Oldest</option>
+            </select>
+          </div>
           <div class="card-grid" id="repo-list"></div>
         </section>
 
         <section id="starred">
-          <h3>Starred Repositories</h3>
+          <div class="filter-container">
+            <h3>Starred Repositories</h3>
+            <select name="starred-filter" id="starred-filter">
+              <option value="">Filter by</option>
+              <option value="newest">Newest</option>
+              <option value="oldest">Oldest</option>
+            </select>
+          </div>
           <div class="card-grid" id="starred-list"></div>
         </section>
       </main>

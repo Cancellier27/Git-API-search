@@ -2,6 +2,10 @@ import {GITHUB_TOKEN} from "./token.js"
 import {cacheData} from "./cache.js"
 
 const form = document.getElementById("search-form") as HTMLFormElement
+const filterRepo = document.getElementById("repo-filter") as HTMLSelectElement
+const filterStar = document.getElementById(
+  "starred-filter"
+) as HTMLSelectElement
 const usernameInput = document.getElementById(
   "username-input"
 ) as HTMLInputElement
@@ -50,6 +54,11 @@ interface Data {
   starredData: GitHubRepo[]
 }
 
+interface Languages {
+  totalValue: number
+  languages: {[key: string]: number}
+}
+
 form.addEventListener("submit", async (event: Event) => {
   try {
     event.preventDefault()
@@ -71,7 +80,7 @@ form.addEventListener("submit", async (event: Event) => {
       data = {
         userData: JSON.parse(cachedUserData),
         reposData: JSON.parse(localStorage.getItem("reposData") || "[]"),
-        starredData: JSON.parse(localStorage.getItem("reposData") || "[]")
+        starredData: JSON.parse(localStorage.getItem("starredData") || "[]")
       }
     } else {
       console.log("fetching data")
@@ -95,6 +104,54 @@ form.addEventListener("submit", async (event: Event) => {
     userNotFound.style.display = "flex"
     console.error("Error fetching data!", error)
   }
+})
+
+filterRepo.addEventListener("change", (e) => {
+  if (!e.target) return
+  const filter = (e.target as HTMLSelectElement).value
+  let repos = JSON.parse(localStorage.getItem("reposData") || "[]")
+
+  if (filter === "newest") {
+    repos.sort(function (a: GitHubRepo, b: GitHubRepo): number {
+      let date_A: number = new Date(a.updated_at).getTime()
+      let date_B: number = new Date(b.updated_at).getTime()
+      return date_B - date_A
+    })
+  }
+
+  if (filter === "oldest") {
+    repos.sort(function (a: GitHubRepo, b: GitHubRepo): number {
+      let date_A: number = new Date(a.updated_at).getTime()
+      let date_B: number = new Date(b.updated_at).getTime()
+      return date_A - date_B
+    })
+  }
+
+  populateLists(repos, repoList, "repo")
+})
+
+filterStar.addEventListener("change", (e) => {
+  if (!e.target) return
+  const filter = (e.target as HTMLSelectElement).value
+  let star = JSON.parse(localStorage.getItem("starredData") || "[]")
+
+  if (filter === "newest") {
+    star.sort(function (a: GitHubRepo, b: GitHubRepo): number {
+      let date_A: number = new Date(a.updated_at).getTime()
+      let date_B: number = new Date(b.updated_at).getTime()
+      return date_B - date_A
+    })
+  }
+
+  if (filter === "oldest") {
+    star.sort(function (a: GitHubRepo, b: GitHubRepo): number {
+      let date_A: number = new Date(a.updated_at).getTime()
+      let date_B: number = new Date(b.updated_at).getTime()
+      return date_A - date_B
+    })
+  }
+
+  populateLists(star, starredList, "star")
 })
 
 async function fetchWithToken(url: string): Promise<Response> {
@@ -169,17 +226,7 @@ function populateLists(
 ) {
   container.innerHTML = "" // Clear old content
 
-  // sort the repos array from newest to oldest
-  const sortedRepos = repos.sort(function (
-    a: GitHubRepo,
-    b: GitHubRepo
-  ): number {
-    let date_A: number = new Date(a.updated_at).getTime()
-    let date_B: number = new Date(b.updated_at).getTime()
-    return date_B - date_A
-  })
-
-  if (sortedRepos.length === 0) {
+  if (repos.length === 0) {
     // if there is no repos or no starred repos, create a card saying that no repos were found
     let message = type === "star" ? "starred " : ""
 
@@ -194,7 +241,7 @@ function populateLists(
     container.appendChild(card)
     return
   } else {
-    sortedRepos.forEach((repo) => {
+    repos.forEach((repo) => {
       // create card tag
       const card = document.createElement("div")
       card.className = "repo-card"
@@ -222,47 +269,66 @@ function populateLists(
 }
 
 async function populateLanguages(repos: GitHubRepo[]) {
-  const languages: {[key: string]: number} = {}
+  let langData: Languages
   let totalValue: number = 0
+  const languages: {[key: string]: number} = {}
+  const cachedLangData = localStorage.getItem("langData")
   // reset DOM element
   languagesUList.innerHTML = ""
   // Hide previous list and show loading message
   languagesList.style.display = "none"
   languagesPlaceholder.style.display = "block"
 
-  // get the languages in a object
-  for (const repo of repos) {
-    try {
-      const response = await fetchWithToken(repo.languages_url)
-
-      if (!response.ok) {
-        console.warn(`Could not fetch languages for repo: ${repo.name}`)
-        continue
-      }
-
-      const languageData = await response.json()
-
-      Object.entries(languageData).forEach(([key, value]) => {
-        if (typeof value === "number") {
-          languages[key] = (languages[key] || 0) + value
-          totalValue += value
-        }
-      })
-    } catch (error) {
-      console.error("Error while fetching the languages:", error)
+  if (cachedLangData) {
+    // get languages data from "cache"
+    console.log("getting Languages data from localStorage")
+    let data = JSON.parse(cachedLangData)
+    langData = {
+      totalValue: data.totalValue,
+      languages: data.languages
     }
+  } else {
+    // fetch the languages and store it in a object
+    console.log("fetching languages")
+    for (const repo of repos) {
+      try {
+        const response = await fetchWithToken(repo.languages_url)
+
+        if (!response.ok) {
+          console.warn(`Could not fetch languages for repo: ${repo.name}`)
+          continue
+        }
+
+        const languageData = await response.json()
+
+        Object.entries(languageData).forEach(([key, value]) => {
+          if (typeof value === "number") {
+            languages[key] = (languages[key] || 0) + value
+            totalValue += value
+          }
+        })
+      } catch (error) {
+        console.error("Error while fetching the languages:", error)
+      }
+    }
+    langData = {
+      totalValue: totalValue,
+      languages: languages
+    }
+    // cache the languages to the localstorage
+    cacheData(langData, "languages")
   }
 
   // append the languages in a tag elements
-  if (Object.keys(languages).length === 0) {
+  if (Object.keys(langData.languages).length === 0) {
     let listEl = document.createElement("li")
     listEl.textContent = "No language used found"
     languagesUList.appendChild(listEl)
   } else {
-    Object.entries(languages)
+    Object.entries(langData.languages)
       .sort()
       .forEach(([key, value]) => {
-        let percentage: number = Math.round(100 * (value / totalValue))
+        let percentage: number = Math.round(100 * (value / langData.totalValue))
 
         // do not create any languages that are 0%
         if (percentage >= 1) {

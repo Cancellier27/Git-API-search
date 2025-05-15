@@ -16,16 +16,21 @@ interface GitHubRepo {
   languages_url: string
 }
 
-export function cacheData(data: (GitHubUser | GitHubRepo[]), type: string): void {
+interface Languages {
+  totalValue: number
+  languages: {[key: string]: number}
+}
 
+export function cacheData(data: GitHubUser | GitHubRepo[] | Languages, type: string): void {
   if (type === "userData") {
     localStorage.setItem("userData", JSON.stringify(data))
   } else if (type === "reposData") {
     localStorage.setItem("reposData", JSON.stringify(data))
   } else if (type === "starredData") {
     localStorage.setItem("starredData", JSON.stringify(data))
+  } else if (type === "languages") {
+    localStorage.setItem("langData", JSON.stringify(data))
   } else {
-    throw new Error("No data stored in LocalStorage!")
+    throw new Error("No data to be stored in LocalStorage!")
   }
-
 }
