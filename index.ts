@@ -1,6 +1,13 @@
-import {GITHUB_TOKEN} from "./token.js"
-import {cacheData} from "./cache.js"
+import {GitHubRepo, Data} from "./src/types.js"
+import {fetchData} from "./src/fetch-data.js"
+import {
+  clearDOM,
+  populateUserProfile,
+  populateLists,
+  populateLanguages
+} from "./src/dom-manipulation.js"
 
+// DOM elements
 const form = document.getElementById("search-form") as HTMLFormElement
 const filterRepo = document.getElementById("repo-filter") as HTMLSelectElement
 const filterStar = document.getElementById(
@@ -9,59 +16,21 @@ const filterStar = document.getElementById(
 const usernameInput = document.getElementById(
   "username-input"
 ) as HTMLInputElement
-
 const results = document.getElementById("results") as HTMLBodyElement
 const userNotFound = document.getElementById("user-not-found") as HTMLElement
-const avatar = document.getElementById("avatar") as HTMLImageElement
-const nameLink = document.getElementById("name-link") as HTMLLinkElement
-const bioEl = document.getElementById("bio") as HTMLElement
-const locationEl = document.getElementById("location") as HTMLElement
-const companyEl = document.getElementById("company") as HTMLElement
-const followersEl = document.getElementById("followers") as HTMLElement
-const followingEl = document.getElementById("following") as HTMLElement
 const repoList = document.getElementById("repo-list") as HTMLUListElement
 const starredList = document.getElementById("starred-list") as HTMLUListElement
-const languagesUList = document.getElementById("languages") as HTMLUListElement
-const languagesPlaceholder = document.querySelector(
-  ".languages-placeholder"
-) as HTMLDivElement
-const languagesList = document.querySelector(
-  ".languages-list"
-) as HTMLDivElement
 const loading = document.querySelector(".loader-container") as HTMLDivElement
 
-interface GitHubUser {
-  avatar_url: string
-  name: string
-  bio: string
-  location: string
-  company: string
-  followers: number
-  following: number
-  html_url: string
-}
+form.addEventListener("submit", async (e: Event) => submitButton(e))
 
-interface GitHubRepo {
-  name: string
-  html_url: string
-  updated_at: string
-  languages_url: string
-}
+filterRepo.addEventListener("change", (e: Event) => sortRepos(e))
 
-interface Data {
-  userData: GitHubUser
-  reposData: GitHubRepo[]
-  starredData: GitHubRepo[]
-}
+filterStar.addEventListener("change", (e: Event) => sortStars(e))
 
-interface Languages {
-  totalValue: number
-  languages: {[key: string]: number}
-}
-
-form.addEventListener("submit", async (event: Event) => {
+async function submitButton(e: Event) {
+  e.preventDefault()
   try {
-    event.preventDefault()
     clearDOM()
     // hide the previous search UI
     results.style.display = "none"
@@ -80,10 +49,10 @@ form.addEventListener("submit", async (event: Event) => {
       data = {
         userData: JSON.parse(cachedUserData),
         reposData: JSON.parse(localStorage.getItem("reposData") || "[]"),
-        starredData: JSON.parse(localStorage.getItem("starredData") || "[]")
+        starredData: JSON.parse(localStorage.getItem("starredData") || "[]"),
+        langData: JSON.parse(localStorage.getItem("langData") || "{}")
       }
     } else {
-      console.log("fetching data")
       // fetch the data from API
       data = await fetchData(username)
     }
@@ -92,7 +61,7 @@ form.addEventListener("submit", async (event: Event) => {
     populateUserProfile(data.userData)
     populateLists(data.reposData, repoList, "repo")
     populateLists(data.starredData, starredList, "star")
-    populateLanguages(data.reposData)
+    populateLanguages(data.langData)
 
     // show the results on screen
     loading.style.display = "none"
@@ -104,9 +73,9 @@ form.addEventListener("submit", async (event: Event) => {
     userNotFound.style.display = "flex"
     console.error("Error fetching data!", error)
   }
-})
+}
 
-filterRepo.addEventListener("change", (e) => {
+function sortRepos(e: Event) {
   if (!e.target) return
   const filter = (e.target as HTMLSelectElement).value
   let repos = JSON.parse(localStorage.getItem("reposData") || "[]")
@@ -128,9 +97,9 @@ filterRepo.addEventListener("change", (e) => {
   }
 
   populateLists(repos, repoList, "repo")
-})
+}
 
-filterStar.addEventListener("change", (e) => {
+function sortStars(e: Event) {
   if (!e.target) return
   const filter = (e.target as HTMLSelectElement).value
   let star = JSON.parse(localStorage.getItem("starredData") || "[]")
@@ -152,218 +121,4 @@ filterStar.addEventListener("change", (e) => {
   }
 
   populateLists(star, starredList, "star")
-})
-
-async function fetchWithToken(url: string): Promise<Response> {
-  return fetch(url, {
-    headers: {
-      Authorization: `token ${GITHUB_TOKEN}`,
-      Accept: "application/vnd.github.v3+json"
-    }
-  })
-}
-
-async function fetchData(username: string) {
-  // fetch all information separately
-  const [userResponse, reposResponse, starredResponse] = await Promise.all([
-    fetchWithToken(`https://api.github.com/users/${username}`),
-    fetchWithToken(`https://api.github.com/users/${username}/repos`),
-    fetchWithToken(`https://api.github.com/users/${username}/starred`)
-  ])
-
-  if (!userResponse.ok) {
-    // show error message
-    userNotFound.textContent = "User not found! Please try again."
-    userNotFound.style.display = "flex"
-    throw new Error("User not found")
-  }
-
-  // get json data from the responses
-  const userData: GitHubUser = await userResponse.json()
-  const reposData: GitHubRepo[] = await reposResponse.json()
-  const starredData: GitHubRepo[] = await starredResponse.json()
-
-  // clean local storage
-  localStorage.clear()
-
-  // add new data to local storage
-  cacheData(userData, "userData")
-  cacheData(reposData, "reposData")
-  cacheData(starredData, "starredData")
-
-  return {userData, reposData, starredData}
-}
-
-// clear DOM elements
-function clearDOM() {
-  avatar.src = ""
-  nameLink.textContent = ""
-  bioEl.textContent = ""
-  locationEl.textContent = ""
-  companyEl.textContent = ""
-  followersEl.textContent = "Followers: 0"
-  followingEl.textContent = "Following: 0"
-  repoList.innerHTML = ""
-  starredList.innerHTML = ""
-}
-
-// Populate the user tags
-function populateUserProfile(user: GitHubUser) {
-  avatar.src = user.avatar_url
-  nameLink.textContent = user.name || "No name provided"
-  bioEl.textContent = user.bio || ""
-  locationEl.textContent = user.location || ""
-  companyEl.textContent = user.company || ""
-  followersEl.textContent = `Followers: ${user.followers}`
-  followingEl.textContent = `Following: ${user.following}`
-  nameLink.href = user.html_url
-}
-
-function populateLists(
-  repos: GitHubRepo[],
-  container: HTMLElement,
-  type: string
-) {
-  container.innerHTML = "" // Clear old content
-
-  if (repos.length === 0) {
-    // if there is no repos or no starred repos, create a card saying that no repos were found
-    let message = type === "star" ? "starred " : ""
-
-    const card = document.createElement("div")
-    card.className = "repo-card"
-
-    const link = document.createElement("a")
-    link.href = "#"
-    link.textContent = `No ${message}repositories found`
-
-    card.appendChild(link)
-    container.appendChild(card)
-    return
-  } else {
-    repos.forEach((repo) => {
-      // create card tag
-      const card = document.createElement("div")
-      card.className = "repo-card"
-
-      // create link tag
-      const link = document.createElement("a")
-      link.href = repo.html_url
-      link.textContent = repo.name
-      link.target = "_blank"
-
-      // create paragraph tag
-      const date = document.createElement("p")
-      // format the date to be like YYYY/MM/DD
-      let lastUpdate = repo.updated_at.split("T")[0].split("-").join("/")
-      date.textContent = lastUpdate
-
-      // append both elements to card
-      card.appendChild(link)
-      card.appendChild(date)
-
-      // append card to the main container
-      container.appendChild(card)
-    })
-  }
-}
-
-async function populateLanguages(repos: GitHubRepo[]) {
-  let langData: Languages
-  let totalValue: number = 0
-  const languages: {[key: string]: number} = {}
-  const cachedLangData = localStorage.getItem("langData")
-  // reset DOM element
-  languagesUList.innerHTML = ""
-  // Hide previous list and show loading message
-  languagesList.style.display = "none"
-  languagesPlaceholder.style.display = "block"
-
-  if (cachedLangData) {
-    // get languages data from "cache"
-    console.log("getting Languages data from localStorage")
-    let data = JSON.parse(cachedLangData)
-    langData = {
-      totalValue: data.totalValue,
-      languages: data.languages
-    }
-  } else {
-    // fetch the languages and store it in a object
-    console.log("fetching languages")
-    for (const repo of repos) {
-      try {
-        const response = await fetchWithToken(repo.languages_url)
-
-        if (!response.ok) {
-          console.warn(`Could not fetch languages for repo: ${repo.name}`)
-          continue
-        }
-
-        const languageData = await response.json()
-
-        Object.entries(languageData).forEach(([key, value]) => {
-          if (typeof value === "number") {
-            languages[key] = (languages[key] || 0) + value
-            totalValue += value
-          }
-        })
-      } catch (error) {
-        console.error("Error while fetching the languages:", error)
-      }
-    }
-    langData = {
-      totalValue: totalValue,
-      languages: languages
-    }
-    // cache the languages to the localstorage
-    cacheData(langData, "languages")
-  }
-
-  // append the languages in a tag elements
-  if (Object.keys(langData.languages).length === 0) {
-    let listEl = document.createElement("li")
-    listEl.textContent = "No language used found"
-    languagesUList.appendChild(listEl)
-  } else {
-    Object.entries(langData.languages)
-      .sort()
-      .forEach(([key, value]) => {
-        let percentage: number = Math.round(100 * (value / langData.totalValue))
-
-        // do not create any languages that are 0%
-        if (percentage >= 1) {
-          let listEl = document.createElement("li") as HTMLLIElement
-          let langName = document.createElement("p") as HTMLParagraphElement
-          let container = document.createElement("div") as HTMLDivElement
-          let langBar = document.createElement("div") as HTMLDivElement
-          let langPercentage = document.createElement(
-            "p"
-          ) as HTMLParagraphElement
-
-          langName.textContent = key
-          langPercentage.textContent = `${percentage}%`
-
-          langBar.style.width = `${percentage}%`
-
-          langBar.style.backgroundColor = `hsl(${
-            Math.random() * 360
-          }, 90%, 80%)`
-
-          langBar.classList.add("lang-bar")
-          langPercentage.classList.add("lang-percentage")
-          container.classList.add("lang-bar-container")
-
-          container.appendChild(langBar)
-          container.appendChild(langPercentage)
-          listEl.appendChild(langName)
-          listEl.appendChild(container)
-          languagesUList.appendChild(listEl)
-        }
-      })
-  }
-  // show languages list and hid the loading message
-  languagesPlaceholder.style.display = "none"
-  languagesList.style.display = "block"
-
-  return
 }
