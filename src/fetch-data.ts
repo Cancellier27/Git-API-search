@@ -14,7 +14,6 @@ export async function fetchData(username: string) {
 
   if (!userResponse.ok) {
     // show error message
-    userNotFound.textContent = "User not found! Please try again."
     userNotFound.style.display = "flex"
     throw new Error("User not found")
   }

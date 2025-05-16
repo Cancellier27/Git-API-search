@@ -36,8 +36,6 @@ header h1 {
 }
 
 #user-not-found {
-  display: none;
-  justify-content: center;
   color: var(--text-error);
   font-size: 1.3rem;
 }
@@ -213,6 +211,7 @@ main h3 {
 
 /* Loading animation */
 
+#user-not-found-container,
 .loader-container {
   display: none;
   justify-content: center;

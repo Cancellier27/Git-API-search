@@ -17,7 +17,9 @@ const usernameInput = document.getElementById(
   "username-input"
 ) as HTMLInputElement
 const results = document.getElementById("results") as HTMLBodyElement
-const userNotFound = document.getElementById("user-not-found") as HTMLElement
+const userNotFound = document.getElementById(
+  "user-not-found-container"
+) as HTMLElement
 const repoList = document.getElementById("repo-list") as HTMLUListElement
 const starredList = document.getElementById("starred-list") as HTMLUListElement
 const loading = document.querySelector(".loader-container") as HTMLDivElement
@@ -33,6 +35,7 @@ async function submitButton(e: Event) {
   try {
     clearDOM()
     // hide the previous search UI
+    userNotFound.style.display = "none"
     results.style.display = "none"
     // show loading message for the hole component
     loading.style.display = "flex"
@@ -69,7 +72,6 @@ async function submitButton(e: Event) {
     results.style.display = "block"
   } catch (error) {
     loading.style.display = "none"
-    userNotFound.innerHTML = `Error while searching for the user:<br>${error}`
     userNotFound.style.display = "flex"
     console.error("Error fetching data!", error)
   }
