@@ -1,5 +1,5 @@
-import {GITHUB_TOKEN} from "../token.js"
-import {GitHubUser, GitHubRepo, Languages} from "./types.js"
+import {GITHUB_TOKEN} from "../token"
+import {GitHubUser, GitHubRepo, Languages} from "./types"
 
 export function cacheData(
   data: GitHubUser | GitHubRepo[] | Languages,

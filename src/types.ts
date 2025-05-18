@@ -1,5 +1,4 @@
 // TS types
-
 export interface GitHubUser {
   avatar_url: string
   name: string

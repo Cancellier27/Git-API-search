@@ -1,11 +1,11 @@
-import {GitHubRepo, Data} from "./src/types.js"
-import {fetchData} from "./src/fetch-data.js"
+import {GitHubRepo, Data} from "./src/types"
+import {fetchData} from "./src/fetch-data"
 import {
   clearDOM,
   populateUserProfile,
   populateLists,
   populateLanguages
-} from "./src/dom-manipulation.js"
+} from "./src/dom-manipulation"
 
 // DOM elements
 const form = document.getElementById("search-form") as HTMLFormElement
@@ -124,3 +124,9 @@ function sortStars(e: Event) {
 
   populateLists(star, starredList, "star")
 }
+
+function testSum(a: number, b: number) {
+  return a + b
+}
+
+export {submitButton, sortRepos, sortStars, testSum}
