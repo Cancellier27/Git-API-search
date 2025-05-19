@@ -1,37 +1,51 @@
 import {GitHubRepo, Data} from "./src/types"
-import {fetchData} from "./src/fetch-data"
+import {fetchData} from "./src/fetch-data.js"
 import {
   clearDOM,
   populateUserProfile,
   populateLists,
   populateLanguages
-} from "./src/dom-manipulation"
+} from "./src/dom-manipulation.js"
 
-// DOM elements
-const form = document.getElementById("search-form") as HTMLFormElement
-const filterRepo = document.getElementById("repo-filter") as HTMLSelectElement
-const filterStar = document.getElementById(
-  "starred-filter"
-) as HTMLSelectElement
-const usernameInput = document.getElementById(
-  "username-input"
-) as HTMLInputElement
-const results = document.getElementById("results") as HTMLBodyElement
-const userNotFound = document.getElementById(
-  "user-not-found-container"
-) as HTMLElement
-const repoList = document.getElementById("repo-list") as HTMLUListElement
-const starredList = document.getElementById("starred-list") as HTMLUListElement
-const loading = document.querySelector(".loader-container") as HTMLDivElement
+function startListeners(): void {
+  // get DOM elements
+  const form =
+    (document.getElementById("search-form") as HTMLFormElement) || null
+  const filterRepo =
+    (document.getElementById("repo-filter") as HTMLSelectElement) || null
+  const filterStar =
+    (document.getElementById("starred-filter") as HTMLSelectElement) || null
 
-form.addEventListener("submit", async (e: Event) => submitButton(e))
+  if (form) {
+    form.addEventListener("submit", async (e: Event) => submitButton(e))
+  }
 
-filterRepo.addEventListener("change", (e: Event) => sortRepos(e))
+  if (filterRepo) {
+    filterRepo.addEventListener("change", (e: Event) => sortRepos(e))
+  }
 
-filterStar.addEventListener("change", (e: Event) => sortStars(e))
+  if (filterStar) {
+    filterStar.addEventListener("change", (e: Event) => sortStars(e))
+  }
+}
 
 async function submitButton(e: Event) {
   e.preventDefault()
+
+  // get DOM elements
+  const userNotFound =
+    (document.getElementById("user-not-found-container") as HTMLElement) || null
+  const loading =
+    (document.querySelector(".loader-container") as HTMLDivElement) || null
+  const results =
+    (document.getElementById("results") as HTMLBodyElement) || null
+  const usernameInput =
+    (document.getElementById("username-input") as HTMLInputElement) || null
+  const repoList =
+    (document.getElementById("repo-list") as HTMLUListElement) || null
+  const starredList =
+    (document.getElementById("starred-list") as HTMLUListElement) || null
+
   try {
     clearDOM()
     // hide the previous search UI
@@ -78,6 +92,10 @@ async function submitButton(e: Event) {
 }
 
 function sortRepos(e: Event) {
+  // get DOM elements
+  const repoList =
+    (document.getElementById("repo-list") as HTMLUListElement) || null
+
   if (!e.target) return
   const filter = (e.target as HTMLSelectElement).value
   let repos = JSON.parse(localStorage.getItem("reposData") || "[]")
@@ -102,6 +120,10 @@ function sortRepos(e: Event) {
 }
 
 function sortStars(e: Event) {
+  // get DOM elements
+  const starredList =
+    (document.getElementById("starred-list") as HTMLUListElement) || null
+
   if (!e.target) return
   const filter = (e.target as HTMLSelectElement).value
   let star = JSON.parse(localStorage.getItem("starredData") || "[]")
@@ -125,8 +147,7 @@ function sortStars(e: Event) {
   populateLists(star, starredList, "star")
 }
 
-function testSum(a: number, b: number) {
-  return a + b
-}
+// start app
+startListeners()
 
-export {submitButton, sortRepos, sortStars, testSum}
+export {startListeners, submitButton, sortRepos, sortStars}

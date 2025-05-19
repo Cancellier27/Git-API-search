@@ -1,4 +1,4 @@
-import {cacheData, fetchWithToken} from "./tools"
+import {cacheData, fetchWithToken} from "./tools.js"
 import {GitHubUser, GitHubRepo, Languages} from "./types"
 
 // DOM elements
