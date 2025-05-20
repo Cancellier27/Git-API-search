@@ -5,6 +5,7 @@ import {GitHubUser, GitHubRepo, Languages} from "./types"
 const userNotFound = document.getElementById("user-not-found") as HTMLElement
 
 export async function fetchData(username: string) {
+  console.log("fetching user data from API")
   // fetch all information separately
   const [userResponse, reposResponse, starredResponse] = await Promise.all([
     fetchWithToken(`https://api.github.com/users/${username}`),

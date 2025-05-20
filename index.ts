@@ -1,20 +1,12 @@
 import {GitHubRepo, Data} from "./src/types"
 import {fetchData} from "./src/fetch-data.js"
-import {
-  clearDOM,
-  populateUserProfile,
-  populateLists,
-  populateLanguages
-} from "./src/dom-manipulation.js"
+import {clearDOM, populateUserProfile, populateLists, populateLanguages} from "./src/dom-manipulation.js"
 
 function startListeners(): void {
   // get DOM elements
-  const form =
-    (document.getElementById("search-form") as HTMLFormElement) || null
-  const filterRepo =
-    (document.getElementById("repo-filter") as HTMLSelectElement) || null
-  const filterStar =
-    (document.getElementById("starred-filter") as HTMLSelectElement) || null
+  const form = (document.getElementById("search-form") as HTMLFormElement) || null
+  const filterRepo = (document.getElementById("repo-filter") as HTMLSelectElement) || null
+  const filterStar = (document.getElementById("starred-filter") as HTMLSelectElement) || null
 
   if (form) {
     form.addEventListener("submit", async (e: Event) => submitButton(e))
@@ -33,18 +25,12 @@ async function submitButton(e: Event) {
   e.preventDefault()
 
   // get DOM elements
-  const userNotFound =
-    (document.getElementById("user-not-found-container") as HTMLElement) || null
-  const loading =
-    (document.querySelector(".loader-container") as HTMLDivElement) || null
-  const results =
-    (document.getElementById("results") as HTMLBodyElement) || null
-  const usernameInput =
-    (document.getElementById("username-input") as HTMLInputElement) || null
-  const repoList =
-    (document.getElementById("repo-list") as HTMLUListElement) || null
-  const starredList =
-    (document.getElementById("starred-list") as HTMLUListElement) || null
+  const userNotFound = (document.getElementById("user-not-found-container") as HTMLElement) || null
+  const loading = (document.querySelector(".loader-container") as HTMLDivElement) || null
+  const results = (document.getElementById("results") as HTMLBodyElement) || null
+  const usernameInput = (document.getElementById("username-input") as HTMLInputElement) || null
+  const repoList = (document.getElementById("repo-list") as HTMLUListElement) || null
+  const starredList = (document.getElementById("starred-list") as HTMLUListElement) || null
 
   try {
     clearDOM()
@@ -93,8 +79,7 @@ async function submitButton(e: Event) {
 
 function sortRepos(e: Event) {
   // get DOM elements
-  const repoList =
-    (document.getElementById("repo-list") as HTMLUListElement) || null
+  const repoList = (document.getElementById("repo-list") as HTMLUListElement) || null
 
   if (!e.target) return
   const filter = (e.target as HTMLSelectElement).value
@@ -117,12 +102,12 @@ function sortRepos(e: Event) {
   }
 
   populateLists(repos, repoList, "repo")
+  return repos
 }
 
 function sortStars(e: Event) {
   // get DOM elements
-  const starredList =
-    (document.getElementById("starred-list") as HTMLUListElement) || null
+  const starredList = (document.getElementById("starred-list") as HTMLUListElement) || null
 
   if (!e.target) return
   const filter = (e.target as HTMLSelectElement).value
@@ -145,6 +130,7 @@ function sortStars(e: Event) {
   }
 
   populateLists(star, starredList, "star")
+  return star
 }
 
 // start app

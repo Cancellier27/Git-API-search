@@ -1,25 +1,17 @@
 import {GitHubUser, GitHubRepo, Data, Languages} from "./types"
 
-// DOM imports
-const avatar = document.getElementById("avatar") as HTMLImageElement
-const nameLink = document.getElementById("name-link") as HTMLLinkElement
-const bioEl = document.getElementById("bio") as HTMLElement
-const locationEl = document.getElementById("location") as HTMLElement
-const companyEl = document.getElementById("company") as HTMLElement
-const followersEl = document.getElementById("followers") as HTMLElement
-const followingEl = document.getElementById("following") as HTMLElement
-const repoList = document.getElementById("repo-list") as HTMLUListElement
-const starredList = document.getElementById("starred-list") as HTMLUListElement
-const languagesUList = document.getElementById("languages") as HTMLUListElement
-const languagesPlaceholder = document.querySelector(
-  ".languages-placeholder"
-) as HTMLDivElement
-const languagesList = document.querySelector(
-  ".languages-list"
-) as HTMLDivElement
-
 // Clear DOM elements to initial state
 function clearDOM() {
+  const avatar = document.getElementById("avatar") as HTMLImageElement
+  const nameLink = document.getElementById("name-link") as HTMLLinkElement
+  const bioEl = document.getElementById("bio") as HTMLElement
+  const locationEl = document.getElementById("location") as HTMLElement
+  const companyEl = document.getElementById("company") as HTMLElement
+  const followersEl = document.getElementById("followers") as HTMLElement
+  const followingEl = document.getElementById("following") as HTMLElement
+  const repoList = document.getElementById("repo-list") as HTMLUListElement
+  const starredList = document.getElementById("starred-list") as HTMLUListElement
+
   avatar.src = ""
   nameLink.textContent = ""
   bioEl.textContent = ""
@@ -33,22 +25,26 @@ function clearDOM() {
 
 // Populate the user tags
 function populateUserProfile(user: GitHubUser) {
+  const avatar = document.getElementById("avatar") as HTMLImageElement
+  const nameLink = document.getElementById("name-link") as HTMLLinkElement
+  const bioEl = document.getElementById("bio") as HTMLElement
+  const locationEl = document.getElementById("location") as HTMLElement
+  const companyEl = document.getElementById("company") as HTMLElement
+  const followersEl = document.getElementById("followers") as HTMLElement
+  const followingEl = document.getElementById("following") as HTMLElement
+
   avatar.src = user.avatar_url
   nameLink.textContent = user.name || "No name provided"
+  nameLink.href = user.html_url
   bioEl.textContent = user.bio || ""
   locationEl.textContent = user.location || ""
   companyEl.textContent = user.company || ""
   followersEl.textContent = `Followers: ${user.followers}`
   followingEl.textContent = `Following: ${user.following}`
-  nameLink.href = user.html_url
 }
 
 // Populate the lists, langData and starred
-function populateLists(
-  repos: GitHubRepo[],
-  container: HTMLElement,
-  type: string
-) {
+function populateLists(repos: GitHubRepo[], container: HTMLElement, type: string) {
   container.innerHTML = "" // Clear old content
 
   if (repos.length === 0) {
@@ -95,6 +91,10 @@ function populateLists(
 
 // Populate the languages
 async function populateLanguages(langData: Languages) {
+  const languagesUList = document.getElementById("languages") as HTMLUListElement
+  const languagesPlaceholder = document.querySelector(".languages-placeholder") as HTMLDivElement
+  const languagesList = document.querySelector(".languages-list") as HTMLDivElement
+
   // reset DOM element
   languagesUList.innerHTML = ""
   // Hide previous list and show loading message
@@ -118,18 +118,14 @@ async function populateLanguages(langData: Languages) {
           let langName = document.createElement("p") as HTMLParagraphElement
           let container = document.createElement("div") as HTMLDivElement
           let langBar = document.createElement("div") as HTMLDivElement
-          let langPercentage = document.createElement(
-            "p"
-          ) as HTMLParagraphElement
+          let langPercentage = document.createElement("p") as HTMLParagraphElement
 
           langName.textContent = key
           langPercentage.textContent = `${percentage}%`
 
           langBar.style.width = `${percentage}%`
 
-          langBar.style.backgroundColor = `hsl(${
-            Math.random() * 360
-          }, 90%, 80%)`
+          langBar.style.backgroundColor = `hsl(${Math.random() * 360}, 90%, 80%)`
 
           langBar.classList.add("lang-bar")
           langPercentage.classList.add("lang-percentage")

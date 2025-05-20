@@ -1,10 +1,5 @@
-import {startListeners, submitButton, sortRepos, sortStars} from "./index"
-import {
-  clearDOM,
-  populateUserProfile,
-  populateLists,
-  populateLanguages
-} from "./src/dom-manipulation.js"
+import {submitButton, sortRepos, sortStars} from "./index"
+import {GitHubRepo, Data} from "./src/types"
 
 // mock the DOM elements
 const setupDOM = () => {
@@ -193,8 +188,7 @@ describe("checking event listeners", () => {
   })
 })
 
-describe("checking the submit button fn", () => {
-  
+describe("checking the submitButton function", () => {
   beforeEach(() => {
     setupDOM()
     jest.clearAllMocks()
@@ -223,5 +217,219 @@ describe("checking the submit button fn", () => {
     await submitButton(e)
 
     expect(loader.style.display).toBe("none") // Should hide after loading
+  })
+})
+
+describe("checking the sortRepo method", () => {
+  beforeEach(() => {
+    setupDOM()
+    jest.clearAllMocks()
+  })
+
+  const mockRepos: GitHubRepo[] = [
+    {
+      id: 1,
+      updated_at: "2023-01-01T00:00:00Z",
+      name: "repo1",
+      html_url: "https://github.com/user/repo1",
+      languages_url: "https://api.github.com/repos/user/repo1/languages"
+    } as GitHubRepo,
+    {
+      id: 2,
+      updated_at: "2023-01-03T00:00:00Z",
+      name: "repo2",
+      html_url: "https://github.com/user/repo2",
+      languages_url: "https://api.github.com/repos/user/repo2/languages"
+    } as GitHubRepo,
+    {
+      id: 3,
+      updated_at: "2023-01-02T00:00:00Z",
+      name: "repo3",
+      html_url: "https://github.com/user/repo3",
+      languages_url: "https://api.github.com/repos/user/repo3/languages"
+    } as GitHubRepo
+  ]
+
+  it("should return early if username is empty", async () => {
+    const e = {target: ""} as unknown as Event
+    sortRepos(e)
+    expect(e.target).toBe("")
+  })
+
+  it("should sort repos by newest", () => {
+    // Mock localStorage
+    Storage.prototype.getItem = jest.fn((key: string) =>
+      key === "reposData" ? JSON.stringify(mockRepos) : null
+    )
+
+    const filter = document.getElementById("repo-filter") as HTMLSelectElement
+    filter.value = "newest"
+    const e = {target: filter} as unknown as Event
+
+    expect(sortRepos(e)).toStrictEqual([
+      {
+        id: 2,
+        updated_at: "2023-01-03T00:00:00Z",
+        name: "repo2",
+        html_url: "https://github.com/user/repo2",
+        languages_url: "https://api.github.com/repos/user/repo2/languages"
+      } as GitHubRepo,
+      {
+        id: 3,
+        updated_at: "2023-01-02T00:00:00Z",
+        name: "repo3",
+        html_url: "https://github.com/user/repo3",
+        languages_url: "https://api.github.com/repos/user/repo3/languages"
+      } as GitHubRepo,
+      {
+        id: 1,
+        updated_at: "2023-01-01T00:00:00Z",
+        name: "repo1",
+        html_url: "https://github.com/user/repo1",
+        languages_url: "https://api.github.com/repos/user/repo1/languages"
+      } as GitHubRepo
+    ])
+  })
+
+  it("should sort repos by oldest", () => {
+    // Mock localStorage
+    Storage.prototype.getItem = jest.fn((key: string) =>
+      key === "reposData" ? JSON.stringify(mockRepos) : null
+    )
+
+    const filter = document.getElementById("repo-filter") as HTMLSelectElement
+    filter.value = "oldest"
+    const e = {target: filter} as unknown as Event
+
+    expect(sortRepos(e)).toStrictEqual([
+      {
+        id: 1,
+        updated_at: "2023-01-01T00:00:00Z",
+        name: "repo1",
+        html_url: "https://github.com/user/repo1",
+        languages_url: "https://api.github.com/repos/user/repo1/languages"
+      } as GitHubRepo,
+      {
+        id: 3,
+        updated_at: "2023-01-02T00:00:00Z",
+        name: "repo3",
+        html_url: "https://github.com/user/repo3",
+        languages_url: "https://api.github.com/repos/user/repo3/languages"
+      } as GitHubRepo,
+      {
+        id: 2,
+        updated_at: "2023-01-03T00:00:00Z",
+        name: "repo2",
+        html_url: "https://github.com/user/repo2",
+        languages_url: "https://api.github.com/repos/user/repo2/languages"
+      } as GitHubRepo
+    ])
+  })
+})
+
+describe("checking the sortStars method", () => {
+  beforeEach(() => {
+    setupDOM()
+    jest.clearAllMocks()
+  })
+
+  const mockStar: GitHubRepo[] = [
+    {
+      id: 1,
+      updated_at: "2023-01-01T00:00:00Z",
+      name: "repo1",
+      html_url: "https://github.com/user/repo1",
+      languages_url: "https://api.github.com/repos/user/repo1/languages"
+    } as GitHubRepo,
+    {
+      id: 2,
+      updated_at: "2023-01-03T00:00:00Z",
+      name: "repo2",
+      html_url: "https://github.com/user/repo2",
+      languages_url: "https://api.github.com/repos/user/repo2/languages"
+    } as GitHubRepo,
+    {
+      id: 3,
+      updated_at: "2023-01-02T00:00:00Z",
+      name: "repo3",
+      html_url: "https://github.com/user/repo3",
+      languages_url: "https://api.github.com/repos/user/repo3/languages"
+    } as GitHubRepo
+  ]
+
+  it("should return early if username is empty", async () => {
+    const e = {target: ""} as unknown as Event
+    sortStars(e)
+    expect(e.target).toBe("")
+  })
+
+  it("should sort repos by newest", () => {
+    // Mock localStorage
+    Storage.prototype.getItem = jest.fn((key: string) =>
+      key === "starredData" ? JSON.stringify(mockStar) : null
+    )
+
+    const filter = document.getElementById("repo-filter") as HTMLSelectElement
+    filter.value = "newest"
+    const e = {target: filter} as unknown as Event
+
+    expect(sortStars(e)).toStrictEqual([
+      {
+        id: 2,
+        updated_at: "2023-01-03T00:00:00Z",
+        name: "repo2",
+        html_url: "https://github.com/user/repo2",
+        languages_url: "https://api.github.com/repos/user/repo2/languages"
+      } as GitHubRepo,
+      {
+        id: 3,
+        updated_at: "2023-01-02T00:00:00Z",
+        name: "repo3",
+        html_url: "https://github.com/user/repo3",
+        languages_url: "https://api.github.com/repos/user/repo3/languages"
+      } as GitHubRepo,
+      {
+        id: 1,
+        updated_at: "2023-01-01T00:00:00Z",
+        name: "repo1",
+        html_url: "https://github.com/user/repo1",
+        languages_url: "https://api.github.com/repos/user/repo1/languages"
+      } as GitHubRepo
+    ])
+  })
+
+  it("should sort repos by oldest", () => {
+    // Mock localStorage
+    Storage.prototype.getItem = jest.fn((key: string) =>
+      key === "starredData" ? JSON.stringify(mockStar) : null
+    )
+
+    const filter = document.getElementById("repo-filter") as HTMLSelectElement
+    filter.value = "oldest"
+    const e = {target: filter} as unknown as Event
+
+    expect(sortStars(e)).toStrictEqual([
+      {
+        id: 1,
+        updated_at: "2023-01-01T00:00:00Z",
+        name: "repo1",
+        html_url: "https://github.com/user/repo1",
+        languages_url: "https://api.github.com/repos/user/repo1/languages"
+      } as GitHubRepo,
+      {
+        id: 3,
+        updated_at: "2023-01-02T00:00:00Z",
+        name: "repo3",
+        html_url: "https://github.com/user/repo3",
+        languages_url: "https://api.github.com/repos/user/repo3/languages"
+      } as GitHubRepo,
+      {
+        id: 2,
+        updated_at: "2023-01-03T00:00:00Z",
+        name: "repo2",
+        html_url: "https://github.com/user/repo2",
+        languages_url: "https://api.github.com/repos/user/repo2/languages"
+      } as GitHubRepo
+    ])
   })
 })
