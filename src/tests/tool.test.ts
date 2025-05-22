@@ -1,96 +1,8 @@
-import {GitHubRepo, Data} from "../types"
-import {cacheData, fetchWithToken} from "../tools.js"
+import {GitHubRepo} from "../types"
+import {cacheData, fetchWithToken, clearLocalStorage} from "../tools.js"
+import {GITHUB_TOKEN} from "../../token.js"
 
-// mock the DOM elements
-const setupDOM = () => {
-  document.body.innerHTML = `
-    <div class="container">
-      <header>
-        <h1>GitHub Search</h1>
-        <form id="search-form">
-          <input
-            type="text"
-            id="username-input"
-            placeholder="Enter GitHub username"
-            required
-          />
-          <button type="submit">Search</button>
-        </form>
-      </header>
-
-      <div class="loader-container">
-        <p class="loading-text">Loading User<span class="dots"></span></p>
-      </div>
-
-      <div id="user-not-found-container">
-        <p id="user-not-found">User not found! Please try again.</p>
-      </div>
-
-      <main id="results">
-        <section id="profile" class="card">
-          <img id="avatar" alt="User avatar" />
-          <h2 id="name">
-            <a id="name-link" target="_blank"></a>
-          </h2>
-          <p id="bio"></p>
-          <p id="location"></p>
-          <p id="company"></p>
-          <div class="follow-stats">
-            <span id="followers">Followers: 0</span>
-            <span id="following">Following: 0</span>
-          </div>
-        </section>
-
-        <section id="languages-container">
-          <div class="languages-placeholder">
-            <p class="loading-text">
-              Loading Languages<span class="dots"></span>
-            </p>
-          </div>
-
-          <div class="languages-list">
-            <h4>Most used languages:</h4>
-            <ul id="languages"></ul>
-          </div>
-        </section>
-
-        <section id="repos">
-          <div class="filter-container">
-            <h3>Repositories</h3>
-            <select name="repo-filter" id="repo-filter">
-              <option value="">Filter by</option>
-              <option value="newest">Newest</option>
-              <option value="oldest">Oldest</option>
-            </select>
-          </div>
-          <div class="card-grid" id="repo-list"></div>
-        </section>
-
-        <section id="starred">
-          <div class="filter-container">
-            <h3>Starred Repositories</h3>
-            <select name="starred-filter" id="starred-filter">
-              <option value="">Filter by</option>
-              <option value="newest">Newest</option>
-              <option value="oldest">Oldest</option>
-            </select>
-          </div>
-          <div class="card-grid" id="starred-list"></div>
-        </section>
-      </main>
-    </div>
-
-    <script src="out/index.js" type="module"></script>
-  `
-}
-
-// Clear the mock DOM elements and mocks
-afterEach(() => {
-  document.body.innerHTML = ""
-  jest.clearAllMocks()
-})
-
-describe("cacheData", () => {
+describe("cacheData function test", () => {
   beforeEach(() => {
     Storage.prototype.setItem = jest.fn()
     localStorage.clear()
@@ -135,25 +47,25 @@ describe("cacheData", () => {
   ]
   const mockLangData = {totalValue: 10000, languages: {JavaScript: 7000, TypeScript: 3000}}
 
-  it("stores userData in localStorage", () => {
+  it("stores userData in localStorage and date", () => {
     cacheData(mockData, "userData")
     expect(localStorage.setItem).toHaveBeenCalledWith("userData", JSON.stringify(mockData))
     expect(localStorage.setItem).toHaveBeenCalledWith("expirationTime", expect.any(String))
   })
 
-  it("stores reposData in localStorage", () => {
+  it("stores reposData in localStorage  and date", () => {
     cacheData(mockArrayData, "reposData")
     expect(localStorage.setItem).toHaveBeenCalledWith("reposData", JSON.stringify(mockArrayData))
     expect(localStorage.setItem).toHaveBeenCalledWith("expirationTime", expect.any(String))
   })
 
-  it("stores starredData in localStorage", () => {
+  it("stores starredData in localStorage  and date", () => {
     cacheData(mockArrayData, "starredData")
     expect(localStorage.setItem).toHaveBeenCalledWith("starredData", JSON.stringify(mockArrayData))
     expect(localStorage.setItem).toHaveBeenCalledWith("expirationTime", expect.any(String))
   })
 
-  it("stores languages in localStorage", () => {
+  it("stores languages in localStorage  and date", () => {
     cacheData(mockLangData, "languages")
     expect(localStorage.setItem).toHaveBeenCalledWith("langData", JSON.stringify(mockLangData))
     expect(localStorage.setItem).toHaveBeenCalledWith("expirationTime", expect.any(String))
@@ -161,5 +73,77 @@ describe("cacheData", () => {
 
   it("throws an error for unknown type", () => {
     expect(() => cacheData(mockData, "invalidType")).toThrow("No data to be stored in LocalStorage!")
+  })
+})
+
+describe("fetchWithToken function test", () => {
+  beforeEach(() => {
+    global.fetch = jest.fn()
+  })
+
+  afterEach(() => {
+    jest.clearAllMocks()
+  })
+
+  it("calls fetch with correct headers", async () => {
+    const mockResponse = Promise.resolve({ok: true, json: () => Promise.resolve({})})
+    ;(global.fetch as jest.Mock) = jest.fn(() => mockResponse)
+
+    const url = "https://api.github.com/users/Cancellier27"
+    await fetchWithToken(url)
+
+    expect(global.fetch).toHaveBeenCalledWith(url, {
+      headers: {
+        Authorization: `token ${GITHUB_TOKEN}`,
+        Accept: "application/vnd.github.v3+json"
+      }
+    })
+  })
+})
+
+describe("clearLocalStorage function test", () => {
+  const logSpy = jest.spyOn(global.console, "log")
+
+
+  beforeEach(() => {
+    Storage.prototype.setItem = jest.fn()
+    localStorage.clear()
+  })
+
+  afterEach(() => {
+    jest.restoreAllMocks()
+    jest.useRealTimers()
+    jest.clearAllMocks()
+  })
+
+  it("clears localStorage if time has passed", () => {
+    const now = Date.now()
+    const past = now - 60 * 60 * 1000 // 1 hour ago
+
+    jest.spyOn(Date, "now").mockReturnValue(now)
+
+    localStorage.setItem("expirationTime", JSON.stringify(past))
+    localStorage.setItem("dummy", "data")
+
+    clearLocalStorage(30)
+
+    expect(localStorage.getItem("dummy")).toBeNull()
+    expect(logSpy).toHaveBeenCalledTimes(1)
+    expect(logSpy).toHaveBeenCalledWith("localStorage cleaned")
+  })
+
+  it("does not clear localStorage if within time", () => {
+    const now = Date.now()
+    const recent = now - 10 * 60 * 1000
+
+    jest.spyOn(Date, "now").mockReturnValue(now)
+
+    localStorage.setItem("expirationTime", JSON.stringify(recent))
+    localStorage.setItem("dummy", "data")
+
+    clearLocalStorage(30)
+
+    expect(localStorage.getItem("dummy")).toBe("data")
+    expect(logSpy).not.toHaveBeenCalled()
   })
 })

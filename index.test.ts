@@ -84,6 +84,26 @@ const setupDOM = () => {
   `
 }
 
+// mock fetch to avoid errors
+beforeEach(() => {
+  global.fetch = jest.fn(() =>
+    Promise.resolve({
+      ok: true, // or false if you want to simulate a failed request
+      status: 200,
+      json: () =>
+        Promise.resolve([
+          {
+            id: 1,
+            updated_at: "2023-01-01T00:00:00Z",
+            name: "repo1",
+            html_url: "https://github.com/user/repo1",
+            languages_url: "https://api.github.com/repos/user/repo1/languages"
+          } as GitHubRepo
+        ])
+    })
+  ) as jest.Mock
+})
+
 // Clear the mock DOM elements
 afterEach(() => {
   document.body.innerHTML = ""
@@ -96,26 +116,15 @@ describe("check the DOM elements", () => {
   })
 
   it("check if tags exists", () => {
-    const form =
-      (document.getElementById("search-form") as HTMLFormElement) || null
-    const filterRepo =
-      (document.getElementById("repo-filter") as HTMLSelectElement) || null
-    const filterStar =
-      (document.getElementById("starred-filter") as HTMLSelectElement) || null
-    const usernameInput = document.getElementById(
-      "username-input"
-    ) as HTMLInputElement
+    const form = (document.getElementById("search-form") as HTMLFormElement) || null
+    const filterRepo = (document.getElementById("repo-filter") as HTMLSelectElement) || null
+    const filterStar = (document.getElementById("starred-filter") as HTMLSelectElement) || null
+    const usernameInput = document.getElementById("username-input") as HTMLInputElement
     const results = document.getElementById("results") as HTMLBodyElement
-    const userNotFound = document.getElementById(
-      "user-not-found-container"
-    ) as HTMLElement
+    const userNotFound = document.getElementById("user-not-found-container") as HTMLElement
     const repoList = document.getElementById("repo-list") as HTMLUListElement
-    const starredList = document.getElementById(
-      "starred-list"
-    ) as HTMLUListElement
-    const loading = document.querySelector(
-      ".loader-container"
-    ) as HTMLDivElement
+    const starredList = document.getElementById("starred-list") as HTMLUListElement
+    const loading = document.querySelector(".loader-container") as HTMLDivElement
 
     expect(form).not.toBeNull()
     expect(filterRepo).not.toBeNull()
@@ -143,8 +152,7 @@ describe("checking event listeners", () => {
 
   it("check the submit form button", () => {
     const mockCallback = jest.fn()
-    const form =
-      (document.getElementById("search-form") as HTMLFormElement) || null
+    const form = (document.getElementById("search-form") as HTMLFormElement) || null
 
     // create the eventListeners on submit
     form.addEventListener("submit", mockCallback)
@@ -164,10 +172,8 @@ describe("checking event listeners", () => {
 
   it("check the filter tag listener change", () => {
     const mockCallback = jest.fn()
-    const filterRepo =
-      (document.getElementById("repo-filter") as HTMLSelectElement) || null
-    const filterStar =
-      (document.getElementById("starred-filter") as HTMLSelectElement) || null
+    const filterRepo = (document.getElementById("repo-filter") as HTMLSelectElement) || null
+    const filterStar = (document.getElementById("starred-filter") as HTMLSelectElement) || null
 
     // create the eventListeners on change
     filterRepo.addEventListener("change", mockCallback)
@@ -258,9 +264,7 @@ describe("checking the sortRepo method", () => {
 
   it("should sort repos by newest", () => {
     // Mock localStorage
-    Storage.prototype.getItem = jest.fn((key: string) =>
-      key === "reposData" ? JSON.stringify(mockRepos) : null
-    )
+    localStorage.setItem("reposData", JSON.stringify(mockRepos))
 
     const filter = document.getElementById("repo-filter") as HTMLSelectElement
     filter.value = "newest"
@@ -293,9 +297,7 @@ describe("checking the sortRepo method", () => {
 
   it("should sort repos by oldest", () => {
     // Mock localStorage
-    Storage.prototype.getItem = jest.fn((key: string) =>
-      key === "reposData" ? JSON.stringify(mockRepos) : null
-    )
+    localStorage.setItem("reposData", JSON.stringify(mockRepos))
 
     const filter = document.getElementById("repo-filter") as HTMLSelectElement
     filter.value = "oldest"
@@ -365,9 +367,7 @@ describe("checking the sortStars method", () => {
 
   it("should sort repos by newest", () => {
     // Mock localStorage
-    Storage.prototype.getItem = jest.fn((key: string) =>
-      key === "starredData" ? JSON.stringify(mockStar) : null
-    )
+    localStorage.setItem("starredData", JSON.stringify(mockStar))
 
     const filter = document.getElementById("repo-filter") as HTMLSelectElement
     filter.value = "newest"
@@ -400,9 +400,7 @@ describe("checking the sortStars method", () => {
 
   it("should sort repos by oldest", () => {
     // Mock localStorage
-    Storage.prototype.getItem = jest.fn((key: string) =>
-      key === "starredData" ? JSON.stringify(mockStar) : null
-    )
+    localStorage.setItem("starredData", JSON.stringify(mockStar))
 
     const filter = document.getElementById("repo-filter") as HTMLSelectElement
     filter.value = "oldest"

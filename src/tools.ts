@@ -1,10 +1,7 @@
 import {GITHUB_TOKEN} from "../token.js"
 import {GitHubUser, GitHubRepo, Languages} from "./types"
 
-export function cacheData(
-  data: GitHubUser | GitHubRepo[] | Languages,
-  type: string
-): void {
+export function cacheData(data: GitHubUser | GitHubRepo[] | Languages, type: string): void {
   if (type === "userData") {
     localStorage.setItem("userData", JSON.stringify(data))
   } else if (type === "reposData") {
@@ -19,10 +16,7 @@ export function cacheData(
 
   // store the last cache time in the localStorage
   let lastCacheTime = new Date()
-  localStorage.setItem(
-    "expirationTime",
-    JSON.stringify(lastCacheTime.getTime())
-  )
+  localStorage.setItem("expirationTime", JSON.stringify(lastCacheTime.getTime()))
 }
 
 export async function fetchWithToken(url: string): Promise<Response> {
@@ -35,17 +29,18 @@ export async function fetchWithToken(url: string): Promise<Response> {
 }
 
 // clear the localStorage after 60 minutes
-function clearLocalStorage(num: number) {
-  let myInterval: number = num * 60 * 1000 // interval
-  let lastCacheTime: number = JSON.parse(
-    localStorage.getItem("expirationTime") || "0"
-  )
+export function clearLocalStorage(num: number) {
+  let myInterval: number = num * 60 * 1000
+  let lastCacheTime: number = JSON.parse(localStorage.getItem("expirationTime") || "0")
 
-  if (lastCacheTime === 0) return
+  if (lastCacheTime === 0) {
+    console.log("Log: lastCacheTime = 0")
+    return
+  }
 
-  let timeNow = new Date()
-  if (timeNow.getTime() - lastCacheTime > myInterval) {
-    // more time has passed, so clean the localStorage
+  let timeNow = Date.now()
+
+  if (timeNow - lastCacheTime > myInterval) {
     console.log("localStorage cleaned")
     localStorage.clear()
   }
