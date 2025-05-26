@@ -1,7 +1,7 @@
 import {GITHUB_TOKEN} from "../token.js"
 import {GitHubUser, GitHubRepo, Languages} from "./types"
 
-export function cacheData(data: GitHubUser | GitHubRepo[] | Languages, type: string): void {
+export function cacheData(data: GitHubUser | GitHubRepo[][] | Languages, type: string): void {
   if (type === "userData") {
     localStorage.setItem("userData", JSON.stringify(data))
   } else if (type === "reposData") {

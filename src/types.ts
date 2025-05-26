@@ -19,8 +19,8 @@ export interface GitHubRepo {
 
 export interface Data {
   userData: GitHubUser
-  reposData: GitHubRepo[]
-  starredData: GitHubRepo[]
+  reposData: GitHubRepo[][]
+  starredData: GitHubRepo[][]
   langData: Languages
 }
 

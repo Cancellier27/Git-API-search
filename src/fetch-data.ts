@@ -30,11 +30,37 @@ export async function fetchData(username: string) {
 
   // get json data from the responses
   const userData: GitHubUser = await userResponse.json()
-  const reposData: GitHubRepo[] = reposResponse.ok ? await reposResponse.json() : []
-  const starredData: GitHubRepo[] = starredResponse.ok ? await starredResponse.json() : []
+  const reposDataNotFormatted: GitHubRepo[] = reposResponse.ok ? await reposResponse.json() : []
+  const starredDataNotFormatted: GitHubRepo[] = starredResponse.ok ? await starredResponse.json() : []
 
   // fetch Languages
-  const langData = await cacheLanguages(reposData)
+  const langData = await cacheLanguages(reposDataNotFormatted)
+
+  // format repos for pagination
+  let repoInnerArr: GitHubRepo[] = []
+  const reposData: GitHubRepo[][] = []
+
+  reposDataNotFormatted.forEach((item) => {
+    if (repoInnerArr.length === 12) {
+      reposData.push(repoInnerArr)
+      repoInnerArr = []
+    }
+    repoInnerArr.push(item)
+  })
+  reposData.push(repoInnerArr)
+
+  // format starred repos for pagination
+  let starInnerArr: GitHubRepo[] = []
+  const starredData: GitHubRepo[][] = []
+
+  starredDataNotFormatted.forEach((item) => {
+    if (starInnerArr.length === 12) {
+      starredData.push(starInnerArr)
+      starInnerArr = []
+    }
+    starInnerArr.push(item)
+  })
+  starredData.push(starInnerArr)
 
   // clean local storage
   localStorage.clear()

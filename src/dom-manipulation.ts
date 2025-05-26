@@ -44,10 +44,10 @@ function populateUserProfile(user: GitHubUser) {
 }
 
 // Populate the lists, langData and starred
-function populateLists(repos: GitHubRepo[], container: HTMLElement, type: string) {
+function populateLists(repos: GitHubRepo[][], container: HTMLElement, type: string, index: number) {
   container.innerHTML = "" // Clear old content
 
-  if (repos.length === 0) {
+  if (repos[index].length === 0) {
     // if there is no repos or no starred repos, create a card saying that no repos were found
     let message = type === "star" ? "starred " : ""
 
@@ -62,7 +62,7 @@ function populateLists(repos: GitHubRepo[], container: HTMLElement, type: string
     container.appendChild(card)
     return
   } else {
-    repos.forEach((repo) => {
+    repos[index].forEach((repo) => {
       // create card tag
       const card = document.createElement("div")
       card.className = "repo-card"

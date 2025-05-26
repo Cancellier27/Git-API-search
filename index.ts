@@ -62,8 +62,8 @@ async function submitButton(e: Event) {
 
     // run functions to populate the DOM
     populateUserProfile(data.userData)
-    populateLists(data.reposData, repoList, "repo")
-    populateLists(data.starredData, starredList, "star")
+    populateLists(data.reposData, repoList, "repo", 0)
+    populateLists(data.starredData, starredList, "star", 0)
     populateLanguages(data.langData)
 
     // show the results on screen
@@ -101,7 +101,7 @@ function sortRepos(e: Event) {
     })
   }
 
-  populateLists(repos, repoList, "repo")
+  populateLists(repos, repoList, "repo", 0)
   return repos
 }
 
@@ -129,7 +129,7 @@ function sortStars(e: Event) {
     })
   }
 
-  populateLists(star, starredList, "star")
+  populateLists(star, starredList, "star", 0)
   return star
 }
 
