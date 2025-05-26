@@ -34,7 +34,6 @@ export function clearLocalStorage(num: number) {
   let lastCacheTime: number = JSON.parse(localStorage.getItem("expirationTime") || "0")
 
   if (lastCacheTime === 0) {
-    console.log("Log: lastCacheTime = 0")
     return
   }
 

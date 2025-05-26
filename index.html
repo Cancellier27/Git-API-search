@@ -3,6 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="shortcut icon" href="#" />
     <title>GitHub Search App</title>
     <link rel="stylesheet" href="style.css" />
   </head>
@@ -11,12 +12,7 @@
       <header>
         <h1>GitHub Search</h1>
         <form id="search-form">
-          <input
-            type="text"
-            id="username-input"
-            placeholder="Enter GitHub username"
-            required
-          />
+          <input type="text" id="username-input" placeholder="Enter GitHub username" required />
           <button type="submit">Search</button>
         </form>
       </header>
@@ -46,9 +42,7 @@
 
         <section id="languages-container">
           <div class="languages-placeholder">
-            <p class="loading-text">
-              Loading Languages<span class="dots"></span>
-            </p>
+            <p class="loading-text">Loading Languages<span class="dots"></span></p>
           </div>
 
           <div class="languages-list">
@@ -67,6 +61,14 @@
             </select>
           </div>
           <div class="card-grid" id="repo-list"></div>
+
+          <div class="page-count-container">
+            <button class="page-arrows">&#10094;</button>
+            <div class="pagination-repos">
+              <button class="pagination">1</button>
+            </div>
+            <button class="page-arrows">&#10095;</button>
+          </div>
         </section>
 
         <section id="starred">
@@ -79,6 +81,14 @@
             </select>
           </div>
           <div class="card-grid" id="starred-list"></div>
+
+          <div class="page-count-container">
+            <button class="page-arrows">&#10094;</button>
+            <div class="pagination-star">
+              <button class="pagination">1</button>
+            </div>
+            <button class="page-arrows">&#10095;</button>
+          </div>
         </section>
       </main>
     </div>

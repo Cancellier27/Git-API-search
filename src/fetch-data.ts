@@ -76,8 +76,6 @@ export async function cacheLanguages(repos: GitHubRepo[]): Promise<Languages> {
     }
   }
 
-  console.log(totalValue, languages)
-
   return {
     totalValue: totalValue,
     languages: languages
