@@ -256,7 +256,8 @@ main h3 {
 
 /* pagination */
 
-.page-count-container {
+.page-count-container-star,
+.page-count-container-repo {
   margin: 10px 0 20px;
   display: flex;
   align-items: center;
@@ -264,13 +265,16 @@ main h3 {
   font-size: 1.1rem;
   font-weight: bold;
 }
-.page-count-container > div {
+.pagination-star,
+.pagination-repo {
   display: flex;
   height: 27px;
 }
 
-.page-arrows-prev,
-.page-arrows-next {
+.page-repo-prev,
+.page-repo-next,
+.page-star-next,
+.page-star-prev {
   height: 27px;
   color: var(--text-color);
   margin: 0 6px;
@@ -281,7 +285,10 @@ main h3 {
   background: none;
 }
 
-.page-arrows:hover {
+.page-repo-prev:hover,
+.page-repo-next:hover,
+.page-star-next:hover,
+.page-star-prev:hover {
   color: var(--accent-color);
   background: none;
   border: 1px solid var(--accent-color);

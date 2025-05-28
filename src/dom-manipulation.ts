@@ -93,18 +93,57 @@ function populateLists(repos: GitHubRepo[][], container: HTMLElement, type: stri
 
 function createPagination(repos: GitHubRepo[][], type: string, index: number): void {
   const repoLength: number = repos.length
+  let pagContainer: HTMLDivElement
   let container: HTMLUListElement
   let paginationEl: HTMLDivElement
+  let prev: HTMLButtonElement
+  let next: HTMLButtonElement
 
   if (type === "star") {
-    paginationEl = document.querySelector(".pagination-star") as HTMLDivElement
     container = (document.getElementById("starred-list") as HTMLUListElement) || null
+    pagContainer = document.querySelector(".page-count-container-star") as HTMLDivElement
+    // cleans the element
+    pagContainer.innerHTML = ""
+
+    // create the elements
+    paginationEl = document.createElement("div")
+    paginationEl.setAttribute("class", "pagination-star")
+
+    prev = document.createElement("button")
+    prev.setAttribute("class", "page-star-prev")
+    prev.innerHTML = "&#10094;"
+
+    next = document.createElement("button")
+    next.setAttribute("class", "page-star-next")
+    next.innerHTML = "&#10095;"
+
+    // Append them to the DOM tree
+    pagContainer.appendChild(prev)
+    pagContainer.appendChild(paginationEl)
+    pagContainer.appendChild(next)
   } else {
-    paginationEl = document.querySelector(".pagination-repos") as HTMLDivElement
     container = (document.getElementById("repo-list") as HTMLUListElement) || null
+    pagContainer = document.querySelector(".page-count-container-repo") as HTMLDivElement
+    // cleans the element
+    pagContainer.innerHTML = ""
+
+    // create the elements
+    paginationEl = document.createElement("div")
+    paginationEl.setAttribute("class", "pagination-repo")
+
+    prev = document.createElement("button")
+    prev.setAttribute("class", "page-repo-prev")
+    prev.innerHTML = "&#10094;"
+
+    next = document.createElement("button")
+    next.setAttribute("class", "page-repo-next")
+    next.innerHTML = "&#10095;"
+
+    // Append them to the DOM tree
+    pagContainer.appendChild(prev)
+    pagContainer.appendChild(paginationEl)
+    pagContainer.appendChild(next)
   }
-  // clean element
-  paginationEl.innerHTML = ""
 
   for (let i = 0; i < repoLength; i++) {
     // create the new pagination item
