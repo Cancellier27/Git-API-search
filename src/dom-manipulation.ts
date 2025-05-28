@@ -47,7 +47,7 @@ function populateUserProfile(user: GitHubUser) {
 function populateLists(repos: GitHubRepo[][], container: HTMLElement, type: string, index: number) {
   container.innerHTML = "" // Clear old content
 
-  if (repos[index].length === 0) {
+  if (repos.length === 0) {
     // if there is no repos or no starred repos, create a card saying that no repos were found
     let message = type === "star" ? "starred " : ""
 
@@ -86,6 +86,41 @@ function populateLists(repos: GitHubRepo[][], container: HTMLElement, type: stri
       // append card to the main container
       container.appendChild(card)
     })
+
+    createPagination(repos, type, index)
+  }
+}
+
+function createPagination(repos: GitHubRepo[][], type: string, index: number): void {
+  const repoLength: number = repos.length
+  let container: HTMLUListElement
+  let paginationEl: HTMLDivElement
+
+  if (type === "star") {
+    paginationEl = document.querySelector(".pagination-star") as HTMLDivElement
+    container = (document.getElementById("starred-list") as HTMLUListElement) || null
+  } else {
+    paginationEl = document.querySelector(".pagination-repos") as HTMLDivElement
+    container = (document.getElementById("repo-list") as HTMLUListElement) || null
+  }
+  // clean element
+  paginationEl.innerHTML = ""
+
+  for (let i = 0; i < repoLength; i++) {
+    // create the new pagination item
+    let pagButton = document.createElement("button")
+    pagButton.setAttribute("class", "pagination")
+    pagButton.addEventListener("click", () => {
+      populateLists(repos, container, type, i)
+    })
+    pagButton.textContent = `${i + 1}`
+
+    if (i === index) {
+      pagButton.classList.add("page-selected")
+    }
+
+    // append to DOM element
+    paginationEl?.appendChild(pagButton)
   }
 }
 

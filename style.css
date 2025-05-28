@@ -269,7 +269,8 @@ main h3 {
   height: 27px;
 }
 
-.page-arrows {
+.page-arrows-prev,
+.page-arrows-next {
   height: 27px;
   color: var(--text-color);
   margin: 0 6px;
@@ -298,6 +299,12 @@ main h3 {
 }
 
 .pagination:hover {
+  color: var(--accent-color);
+  background: none;
+  border: 1px solid var(--accent-color);
+}
+
+.page-selected {
   color: var(--accent-color);
   background: none;
   border: 1px solid var(--accent-color);
