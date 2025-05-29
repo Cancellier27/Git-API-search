@@ -1,5 +1,5 @@
-import {GitHubRepo, Data} from "./src/types"
-import {fetchData} from "./src/fetch-data.js"
+import {GitHubRepo, Data} from "./src/types.js"
+import {fetchData, formatReposForPagination} from "./src/fetch-data.js"
 import {clearDOM, populateUserProfile, populateLists, populateLanguages} from "./src/dom-manipulation.js"
 
 function startListeners(): void {
@@ -83,23 +83,30 @@ function sortRepos(e: Event) {
 
   if (!e.target) return
   const filter = (e.target as HTMLSelectElement).value
-  let repos = JSON.parse(localStorage.getItem("reposData") || "[]")
+  let reposUnFormatted: GitHubRepo[] = []
+
+  JSON.parse(localStorage.getItem("reposData") || "[]").forEach((item: GitHubRepo[]) => {
+    reposUnFormatted.push(...item)
+  })
 
   if (filter === "newest") {
-    repos.sort(function (a: GitHubRepo, b: GitHubRepo): number {
+    reposUnFormatted.sort(function (a: GitHubRepo, b: GitHubRepo): number {
       let date_A: number = new Date(a.updated_at).getTime()
       let date_B: number = new Date(b.updated_at).getTime()
       return date_B - date_A
     })
-  }
-
-  if (filter === "oldest") {
-    repos.sort(function (a: GitHubRepo, b: GitHubRepo): number {
+  } else if (filter === "oldest") {
+    reposUnFormatted.sort(function (a: GitHubRepo, b: GitHubRepo): number {
       let date_A: number = new Date(a.updated_at).getTime()
       let date_B: number = new Date(b.updated_at).getTime()
       return date_A - date_B
     })
+  } else {
+    return
   }
+
+  // format repos to the 12 items format
+  const repos: GitHubRepo[][] = formatReposForPagination(reposUnFormatted)
 
   populateLists(repos, repoList, "repo", 0)
   return repos
@@ -111,23 +118,30 @@ function sortStars(e: Event) {
 
   if (!e.target) return
   const filter = (e.target as HTMLSelectElement).value
-  let star = JSON.parse(localStorage.getItem("starredData") || "[]")
+  let starUnFormatted: GitHubRepo[] = []
+
+  JSON.parse(localStorage.getItem("starredData") || "[]").forEach((item: GitHubRepo[]) => {
+    starUnFormatted.push(...item)
+  })
 
   if (filter === "newest") {
-    star.sort(function (a: GitHubRepo, b: GitHubRepo): number {
+    starUnFormatted.sort(function (a: GitHubRepo, b: GitHubRepo): number {
       let date_A: number = new Date(a.updated_at).getTime()
       let date_B: number = new Date(b.updated_at).getTime()
       return date_B - date_A
     })
-  }
-
-  if (filter === "oldest") {
-    star.sort(function (a: GitHubRepo, b: GitHubRepo): number {
+  } else if (filter === "oldest") {
+    starUnFormatted.sort(function (a: GitHubRepo, b: GitHubRepo): number {
       let date_A: number = new Date(a.updated_at).getTime()
       let date_B: number = new Date(b.updated_at).getTime()
       return date_A - date_B
     })
+  } else {
+    return
   }
+
+  // format repos to the 12 items format
+  const star: GitHubRepo[][] = formatReposForPagination(starUnFormatted)
 
   populateLists(star, starredList, "star", 0)
   return star

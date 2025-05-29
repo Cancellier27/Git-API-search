@@ -1,5 +1,5 @@
 import {cacheData, fetchWithToken} from "./tools.js"
-import {GitHubUser, GitHubRepo, Languages} from "./types"
+import {GitHubUser, GitHubRepo, Languages} from "./types.js"
 
 export async function fetchData(username: string) {
   console.log("fetching user data from API")
@@ -37,6 +37,23 @@ export async function fetchData(username: string) {
   const langData = await cacheLanguages(reposDataNotFormatted)
 
   // format repos for pagination
+  const reposData = formatReposForPagination(reposDataNotFormatted)
+  const starredData = formatReposForPagination(starredDataNotFormatted)
+
+  // clean local storage
+  localStorage.clear()
+
+  // add new data to local storage
+  cacheData(userData, "userData") //user data
+  cacheData(reposData, "reposData") // repos data
+  cacheData(starredData, "starredData") // starred repos data
+  cacheData(langData, "languages") // used languages data
+
+  return {userData, reposData, starredData, langData}
+}
+
+export function formatReposForPagination(reposDataNotFormatted: GitHubRepo[]): GitHubRepo[][] {
+  // format repos for pagination
   let repoInnerArr: GitHubRepo[] = []
   const reposData: GitHubRepo[][] = []
 
@@ -49,29 +66,7 @@ export async function fetchData(username: string) {
   })
   reposData.push(repoInnerArr)
 
-  // format starred repos for pagination
-  let starInnerArr: GitHubRepo[] = []
-  const starredData: GitHubRepo[][] = []
-
-  starredDataNotFormatted.forEach((item) => {
-    if (starInnerArr.length === 12) {
-      starredData.push(starInnerArr)
-      starInnerArr = []
-    }
-    starInnerArr.push(item)
-  })
-  starredData.push(starInnerArr)
-
-  // clean local storage
-  localStorage.clear()
-
-  // add new data to local storage
-  cacheData(userData, "userData") //user data
-  cacheData(reposData, "reposData") // repos data
-  cacheData(starredData, "starredData") // starred repos data
-  cacheData(langData, "languages") // used languages data
-
-  return {userData, reposData, starredData, langData}
+  return reposData
 }
 
 export async function cacheLanguages(repos: GitHubRepo[]): Promise<Languages> {

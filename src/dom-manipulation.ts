@@ -1,4 +1,4 @@
-import {GitHubUser, GitHubRepo, Languages} from "./types"
+import {GitHubUser, GitHubRepo, Languages} from "./types.js"
 
 // Clear DOM elements to initial state
 function clearDOM() {
