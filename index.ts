@@ -1,6 +1,7 @@
 import {GitHubRepo, Data} from "./src/types.js"
 import {fetchData, formatReposForPagination} from "./src/fetch-data.js"
 import {clearDOM, populateUserProfile, populateLists, populateLanguages} from "./src/dom-manipulation.js"
+import {cacheData} from "./src/tools.js"
 
 function startListeners(): void {
   // get DOM elements
@@ -109,7 +110,7 @@ function sortRepos(e: Event) {
   const repos: GitHubRepo[][] = formatReposForPagination(reposUnFormatted)
 
   // upload new repos list to the localstorage
-  // ...
+  cacheData(repos, "reposData")
 
   populateLists(repos, repoList, "repo", 0)
   return repos
@@ -145,6 +146,9 @@ function sortStars(e: Event) {
 
   // format repos to the 12 items format
   const star: GitHubRepo[][] = formatReposForPagination(starUnFormatted)
+
+  // upload new repos list to the localstorage
+  cacheData(star, "starredData")
 
   populateLists(star, starredList, "star", 0)
   return star
