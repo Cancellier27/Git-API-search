@@ -108,6 +108,9 @@ function sortRepos(e: Event) {
   // format repos to the 12 items format
   const repos: GitHubRepo[][] = formatReposForPagination(reposUnFormatted)
 
+  // upload new repos list to the localstorage
+  // ...
+
   populateLists(repos, repoList, "repo", 0)
   return repos
 }

@@ -294,7 +294,8 @@ main h3 {
   border: 1px solid var(--accent-color);
 }
 
-.pagination {
+.pag-repo-num,
+.pag-star-num {
   color: var(--text-color);
   background: none;
   border-radius: 0;
@@ -305,7 +306,8 @@ main h3 {
   text-align: center;
 }
 
-.pagination:hover {
+.pag-repo-num:hover,
+.pag-star-num:hover {
   color: var(--accent-color);
   background: none;
   border: 1px solid var(--accent-color);

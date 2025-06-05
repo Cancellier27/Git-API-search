@@ -117,10 +117,31 @@ function createPagination(repos: GitHubRepo[][], type: string, index: number): v
     next.setAttribute("class", "page-star-next")
     next.innerHTML = "&#10095;"
 
+    // add the event listener to next and per buttons
+    next.addEventListener("click", () => nextPrevPage(["star", "next"]))
+    prev.addEventListener("click", () => nextPrevPage(["star", "prev"]))
+
     // Append them to the DOM tree
     pagContainer.appendChild(prev)
     pagContainer.appendChild(paginationEl)
     pagContainer.appendChild(next)
+
+    for (let i = 0; i < repoLength; i++) {
+      // create the new pagination item
+      let pagButton = document.createElement("button")
+      pagButton.setAttribute("class", "pag-star-num")
+      pagButton.addEventListener("click", () => {
+        populateLists(repos, container, type, i)
+      })
+      pagButton.textContent = `${i + 1}`
+
+      if (i === index) {
+        pagButton.classList.add("page-selected")
+      }
+
+      // append to DOM element
+      paginationEl?.appendChild(pagButton)
+    }
   } else {
     container = (document.getElementById("repo-list") as HTMLUListElement) || null
     pagContainer = document.querySelector(".page-count-container-repo") as HTMLDivElement
@@ -139,27 +160,31 @@ function createPagination(repos: GitHubRepo[][], type: string, index: number): v
     next.setAttribute("class", "page-repo-next")
     next.innerHTML = "&#10095;"
 
+    // add the event listener to next and per buttons
+    next.addEventListener("click", () => nextPrevPage(["repo", "next"]))
+    prev.addEventListener("click", () => nextPrevPage(["repo", "prev"]))
+
     // Append them to the DOM tree
     pagContainer.appendChild(prev)
     pagContainer.appendChild(paginationEl)
     pagContainer.appendChild(next)
-  }
 
-  for (let i = 0; i < repoLength; i++) {
-    // create the new pagination item
-    let pagButton = document.createElement("button")
-    pagButton.setAttribute("class", "pagination")
-    pagButton.addEventListener("click", () => {
-      populateLists(repos, container, type, i)
-    })
-    pagButton.textContent = `${i + 1}`
+    for (let i = 0; i < repoLength; i++) {
+      // create the new pagination item
+      let pagButton = document.createElement("button")
+      pagButton.setAttribute("class", "pag-repo-num")
+      pagButton.addEventListener("click", () => {
+        populateLists(repos, container, type, i)
+      })
+      pagButton.textContent = `${i + 1}`
 
-    if (i === index) {
-      pagButton.classList.add("page-selected")
+      if (i === index) {
+        pagButton.classList.add("page-selected")
+      }
+
+      // append to DOM element
+      paginationEl?.appendChild(pagButton)
     }
-
-    // append to DOM element
-    paginationEl?.appendChild(pagButton)
   }
 }
 
@@ -218,6 +243,63 @@ async function populateLanguages(langData: Languages) {
   languagesList.style.display = "block"
 
   return
+}
+
+function nextPrevPage([type, data]: [string, string]) {
+  if (type === "repo") {
+    let container = (document.getElementById("repo-list") as HTMLUListElement) || null
+    let repoData: GitHubRepo[][] = JSON.parse(localStorage.getItem("reposData") || "[]")
+    let paginationList = document.querySelectorAll(".pag-repo-num")
+    let currentPage: number = -1
+    // check if there is only one page or less
+    if (paginationList.length <= 1) return
+
+    for (let i = 0; i < paginationList.length; i++) {
+      if (paginationList[i].className === "pag-repo-num page-selected") {
+        currentPage = i
+      }
+    }
+
+    if (currentPage != -1) {
+      if (data === "next" && currentPage < repoData.length - 1) {
+        populateLists(repoData, container, type, currentPage + 1)
+        return
+      } else if (data === "prev" && currentPage > 0) {
+        populateLists(repoData, container, type, currentPage - 1)
+        return
+      } else {
+        return
+      }
+    }
+  } else if (type === "star") {
+    let container = (document.getElementById("starred-list") as HTMLUListElement) || null
+    let repoData: GitHubRepo[][] = JSON.parse(localStorage.getItem("starredData") || "[]")
+
+    let paginationList = document.querySelectorAll(".pag-star-num")
+    let currentPage: number = -1
+    // check if there is only one page or less
+    if (paginationList.length <= 1) return
+
+    for (let i = 0; i < paginationList.length; i++) {
+      if (paginationList[i].className === "pag-star-num page-selected") {
+        currentPage = i
+      }
+    }
+
+    if (currentPage != -1) {
+      if (data === "next" && currentPage < repoData.length - 1) {
+        populateLists(repoData, container, type, currentPage + 1)
+        return
+      } else if (data === "prev" && currentPage > 0) {
+        populateLists(repoData, container, type, currentPage - 1)
+        return
+      } else {
+        return
+      }
+    }
+  } else {
+    return
+  }
 }
 
 export {clearDOM, populateUserProfile, populateLists, populateLanguages}
