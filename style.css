@@ -41,7 +41,7 @@ header h1 {
 }
 
 #results {
-  /* display: none; */
+  display: none;
 }
 
 #search-form {
