@@ -19,14 +19,15 @@ export function cacheData(data: GitHubUser | GitHubRepo[][] | Languages, type: s
   localStorage.setItem("expirationTime", JSON.stringify(lastCacheTime.getTime()))
 }
 
-export async function fetchWithToken(url: string): Promise<Response> {
-  return fetch(url, {
-    headers: {
-      Authorization: `token ${GITHUB_TOKEN}`,
-      Accept: "application/vnd.github.v3+json"
-    }
-  })
-}
+// remove this and add a file called token.ts with your github token in it, and change the fetch calls for fetchWithToken(url)
+// export async function fetchWithToken(url: string): Promise<Response> {
+//   return fetch(url, {
+//     headers: {
+//       Authorization: `token ${GITHUB_TOKEN}`,
+//       Accept: "application/vnd.github.v3+json"
+//     }
+//   })
+// }
 
 // clear the localStorage after 60 minutes
 export function clearLocalStorage(num: number) {

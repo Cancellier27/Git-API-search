@@ -1,4 +1,4 @@
-import {cacheData, fetchWithToken} from "./tools.js"
+import {cacheData} from "./tools.js"
 import {GitHubUser, GitHubRepo, Languages} from "./types.js"
 
 export async function fetchData(username: string) {
@@ -9,9 +9,9 @@ export async function fetchData(username: string) {
 
   // fetch all information separately
   const [userResponse, reposResponse, starredResponse] = await Promise.all([
-    fetchWithToken(`https://api.github.com/users/${username}`),
-    fetchWithToken(`https://api.github.com/users/${username}/repos`),
-    fetchWithToken(`https://api.github.com/users/${username}/starred`)
+    fetch(`https://api.github.com/users/${username}`),
+    fetch(`https://api.github.com/users/${username}/repos`),
+    fetch(`https://api.github.com/users/${username}/starred`)
   ])
 
   if (!userResponse.ok) {
@@ -74,7 +74,7 @@ export async function cacheLanguages(repos: GitHubRepo[]): Promise<Languages> {
   const languages: {[key: string]: number} = {}
   for (const repo of repos) {
     try {
-      const response = await fetchWithToken(repo.languages_url)
+      const response = await fetch(repo.languages_url)
 
       if (!response.ok) {
         console.warn(`Could not fetch languages for repo: ${repo.name}`)

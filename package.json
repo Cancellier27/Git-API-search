@@ -6,7 +6,8 @@
   "scripts": {
     "test": "jest",
     "test:watch": "jest --watch",
-    "start": "npx http-server"
+    "start": "npx http-server",
+    "build": "tsc"
   },
   "keywords": [],
   "author": "",
