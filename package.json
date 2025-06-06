@@ -8,7 +8,7 @@
     "test:watch": "jest --watch",
     "start": "npx http-server",
     "build": "tsc && npm run copy-static",
-    "copy-static": "copyfiles -u 1 index.html style.css out"
+    "copy-static": "copyfiles index.html style.css out"
   },
   "keywords": [],
   "author": "",
